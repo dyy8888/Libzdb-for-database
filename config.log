@@ -27,8 +27,6 @@ uname -v = #86~20.04.2-Ubuntu SMP Mon Jul 17 23:27:17 UTC 2023
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
-PATH: /home/dyy/.local/share/umake/bin
-PATH: /home/dyy/.local/bin
 PATH: /home/dyy/.nvm/versions/node/v16.14.0/bin
 PATH: /home/dyy/.local/share/umake/bin
 PATH: /home/dyy/.local/bin
@@ -41,7 +39,6 @@ PATH: /bin
 PATH: /usr/games
 PATH: /usr/local/games
 PATH: /snap/bin
-PATH: /usr/local/go/bin
 PATH: /usr/local/go/bin
 PATH: /bin
 PATH: /home/dyy/typora
@@ -69,7 +66,7 @@ configure:3255: found /usr/bin/gcc
 configure:3266: result: gcc
 configure:3495: checking for C compiler version
 configure:3504: gcc --version >&5
-gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
 Copyright (C) 2019 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -82,9 +79,9 @@ COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper
 OFFLOAD_TARGET_NAMES=nvptx-none:hsa
 OFFLOAD_TARGET_DEFAULT=1
 Target: x86_64-linux-gnu
-Configured with: ../src/configure -v --with-pkgversion='Ubuntu 9.4.0-1ubuntu1~20.04.1' --with-bugurl=file:///usr/share/doc/gcc-9/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,gm2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-9 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-9-Av3uEd/gcc-9-9.4.0/debian/tmp-nvptx/usr,hsa --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 9.4.0-1ubuntu1~20.04.2' --with-bugurl=file:///usr/share/doc/gcc-9/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,gm2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-9 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-9-9QDOt0/gcc-9-9.4.0/debian/tmp-nvptx/usr,hsa --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
-gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.1) 
+gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2) 
 configure:3515: $? = 0
 configure:3504: gcc -V >&5
 gcc: error: unrecognized command line option '-V'
@@ -136,8 +133,8 @@ configure:3983: $? = 0
 configure:3995: result: yes
 configure:4015: checking whether make supports the include directive
 configure:4030: make -f confmf.GNU && cat confinc.out
-make[4]: Entering directory '/home/dyy/libzdb-3.2.3'
-make[4]: Leaving directory '/home/dyy/libzdb-3.2.3'
+make[1]: Entering directory '/home/dyy/LibzdbForDM'
+make[1]: Leaving directory '/home/dyy/LibzdbForDM'
 this is the am__doit target
 configure:4033: $? = 0
 configure:4052: result: yes (GNU style)
@@ -148,7 +145,7 @@ configure:4277: found /usr/bin/g++
 configure:4288: result: g++
 configure:4315: checking for C++ compiler version
 configure:4324: g++ --version >&5
-g++ (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+g++ (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
 Copyright (C) 2019 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -161,9 +158,9 @@ COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper
 OFFLOAD_TARGET_NAMES=nvptx-none:hsa
 OFFLOAD_TARGET_DEFAULT=1
 Target: x86_64-linux-gnu
-Configured with: ../src/configure -v --with-pkgversion='Ubuntu 9.4.0-1ubuntu1~20.04.1' --with-bugurl=file:///usr/share/doc/gcc-9/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,gm2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-9 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-9-Av3uEd/gcc-9-9.4.0/debian/tmp-nvptx/usr,hsa --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 9.4.0-1ubuntu1~20.04.2' --with-bugurl=file:///usr/share/doc/gcc-9/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,gm2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-9 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-9-9QDOt0/gcc-9-9.4.0/debian/tmp-nvptx/usr,hsa --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
-gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.1) 
+gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2) 
 configure:4335: $? = 0
 configure:4324: g++ -V >&5
 g++: error: unrecognized command line option '-V'
@@ -407,12 +404,12 @@ configure:5526: checking lex output file root
 configure:5540: result: lex.yy
 configure:5545: checking lex library
 configure:5559: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c   >&5
-/usr/bin/ld: /tmp/ccNXKkZ7.o: in function `input':
-/home/dyy/libzdb-3.2.3/lex.yy.c:1180: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccNXKkZ7.o: in function `yylex':
-/home/dyy/libzdb-3.2.3/lex.yy.c:871: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccNXKkZ7.o: in function `main':
-/home/dyy/libzdb-3.2.3/conftest.l:17: undefined reference to `yywrap'
+/usr/bin/ld: /tmp/cc0258Bf.o: in function `input':
+/home/dyy/LibzdbForDM/lex.yy.c:1180: undefined reference to `yywrap'
+/usr/bin/ld: /tmp/cc0258Bf.o: in function `yylex':
+/home/dyy/LibzdbForDM/lex.yy.c:871: undefined reference to `yywrap'
+/usr/bin/ld: /tmp/cc0258Bf.o: in function `main':
+/home/dyy/LibzdbForDM/conftest.l:17: undefined reference to `yywrap'
 collect2: error: ld returned 1 exit status
 configure:5559: $? = 1
 configure: failed program was:
@@ -2493,8 +2490,8 @@ configure:12624: $? = 0
 configure:12624: result: yes
 configure:12638: checking for library containing pthread_create
 configure:12669: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c  >&5
-/usr/bin/ld: /tmp/ccyV7Msv.o: in function `main':
-/home/dyy/libzdb-3.2.3/conftest.c:40: undefined reference to `pthread_create'
+/usr/bin/ld: /tmp/ccCU8dSN.o: in function `main':
+/home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
 configure:12669: $? = 1
 configure: failed program was:
@@ -2553,8 +2550,8 @@ configure:12838: checking for SQLite3
 configure:13004: result: yes
 configure:13006: checking for library containing sqlite3_open
 configure:13037: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c -lpthread  >&5
-/usr/bin/ld: /tmp/ccOlS1ui.o: in function `main':
-/home/dyy/libzdb-3.2.3/conftest.c:40: undefined reference to `sqlite3_open'
+/usr/bin/ld: /tmp/ccQxxxQF.o: in function `main':
+/home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `sqlite3_open'
 collect2: error: ld returned 1 exit status
 configure:13037: $? = 1
 configure: failed program was:
@@ -2886,7 +2883,7 @@ lt_cv_truncate_bin='/usr/bin/dd bs=4096 count=1'
 ## Output variables. ##
 ## ----------------- ##
 
-ACLOCAL='${SHELL} /home/dyy/libzdb-3.2.3/config/missing aclocal-1.16'
+ACLOCAL='${SHELL} /home/dyy/LibzdbForDM/config/missing aclocal-1.16'
 AMDEPBACKSLASH='\'
 AMDEP_FALSE='#'
 AMDEP_TRUE=''
@@ -2896,9 +2893,9 @@ AM_DEFAULT_V='$(AM_DEFAULT_VERBOSITY)'
 AM_DEFAULT_VERBOSITY='1'
 AM_V='$(V)'
 AR='ar'
-AUTOCONF='${SHELL} /home/dyy/libzdb-3.2.3/config/missing autoconf'
-AUTOHEADER='${SHELL} /home/dyy/libzdb-3.2.3/config/missing autoheader'
-AUTOMAKE='${SHELL} /home/dyy/libzdb-3.2.3/config/missing automake-1.16'
+AUTOCONF='${SHELL} /home/dyy/LibzdbForDM/config/missing autoconf'
+AUTOHEADER='${SHELL} /home/dyy/LibzdbForDM/config/missing autoheader'
+AUTOMAKE='${SHELL} /home/dyy/LibzdbForDM/config/missing automake-1.16'
 AWK='gawk'
 CC='gcc'
 CCDEPMODE='depmode=none'
@@ -2941,7 +2938,7 @@ LIPO=''
 LN_S='ln -s'
 LTLIBOBJS=''
 LT_SYS_LIBRARY_PATH=''
-MAKEINFO='${SHELL} /home/dyy/libzdb-3.2.3/config/missing makeinfo'
+MAKEINFO='${SHELL} /home/dyy/LibzdbForDM/config/missing makeinfo'
 MANIFEST_TOOL=':'
 MKDIR_P='/usr/bin/mkdir -p'
 MYSQLCONFIG='/usr/bin/mysql_config'
@@ -3014,7 +3011,7 @@ host_vendor='pc'
 htmldir='${docdir}'
 includedir='${prefix}/include'
 infodir='${datarootdir}/info'
-install_sh='${SHELL} /home/dyy/libzdb-3.2.3/config/install-sh'
+install_sh='${SHELL} /home/dyy/LibzdbForDM/config/install-sh'
 libdir='${exec_prefix}/lib'
 libexecdir='${exec_prefix}/libexec'
 localedir='${datarootdir}/locale'

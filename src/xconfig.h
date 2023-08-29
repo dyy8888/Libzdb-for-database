@@ -23,7 +23,7 @@
 /* #undef HAVE_LIBCRYPTO */
 
 /* Define to 1 to enable mysql */
-#define HAVE_LIBMYSQLCLIENT 1
+// #define HAVE_LIBMYSQLCLIENT 1
 
 /* Define to 1 to enable postgresql */
 /* #undef HAVE_LIBPQ */
