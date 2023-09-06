@@ -136,8 +136,8 @@ configure:3983: $? = 0
 configure:3995: result: yes
 configure:4015: checking whether make supports the include directive
 configure:4030: make -f confmf.GNU && cat confinc.out
-make[4]: Entering directory '/home/dyy/libzdb-3.2.3'
-make[4]: Leaving directory '/home/dyy/libzdb-3.2.3'
+make[4]: Entering directory '/home/dyy/LibzdbForDM'
+make[4]: Leaving directory '/home/dyy/LibzdbForDM'
 this is the am__doit target
 configure:4033: $? = 0
 configure:4052: result: yes (GNU style)
@@ -407,12 +407,12 @@ configure:5526: checking lex output file root
 configure:5540: result: lex.yy
 configure:5545: checking lex library
 configure:5559: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c   >&5
-/usr/bin/ld: /tmp/ccKtdLM5.o: in function `input':
-/home/dyy/libzdb-3.2.3/lex.yy.c:1180: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccKtdLM5.o: in function `yylex':
-/home/dyy/libzdb-3.2.3/lex.yy.c:871: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccKtdLM5.o: in function `main':
-/home/dyy/libzdb-3.2.3/conftest.l:17: undefined reference to `yywrap'
+/usr/bin/ld: /tmp/ccSQ7WWE.o: in function `input':
+/home/dyy/LibzdbForDM/lex.yy.c:1180: undefined reference to `yywrap'
+/usr/bin/ld: /tmp/ccSQ7WWE.o: in function `yylex':
+/home/dyy/LibzdbForDM/lex.yy.c:871: undefined reference to `yywrap'
+/usr/bin/ld: /tmp/ccSQ7WWE.o: in function `main':
+/home/dyy/LibzdbForDM/conftest.l:17: undefined reference to `yywrap'
 collect2: error: ld returned 1 exit status
 configure:5559: $? = 1
 configure: failed program was:
@@ -2493,8 +2493,8 @@ configure:12624: $? = 0
 configure:12624: result: yes
 configure:12638: checking for library containing pthread_create
 configure:12669: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c  >&5
-/usr/bin/ld: /tmp/ccqWRGki.o: in function `main':
-/home/dyy/libzdb-3.2.3/conftest.c:40: undefined reference to `pthread_create'
+/usr/bin/ld: /tmp/cc3C2lml.o: in function `main':
+/home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
 configure:12669: $? = 1
 configure: failed program was:
@@ -2553,8 +2553,8 @@ configure:12838: checking for SQLite3
 configure:13004: result: yes
 configure:13006: checking for library containing sqlite3_open
 configure:13037: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c -lpthread  >&5
-/usr/bin/ld: /tmp/ccZXiS3m.o: in function `main':
-/home/dyy/libzdb-3.2.3/conftest.c:40: undefined reference to `sqlite3_open'
+/usr/bin/ld: /tmp/cc0mmd99.o: in function `main':
+/home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `sqlite3_open'
 collect2: error: ld returned 1 exit status
 configure:13037: $? = 1
 configure: failed program was:
@@ -2886,7 +2886,7 @@ lt_cv_truncate_bin='/usr/bin/dd bs=4096 count=1'
 ## Output variables. ##
 ## ----------------- ##
 
-ACLOCAL='${SHELL} /home/dyy/libzdb-3.2.3/config/missing aclocal-1.16'
+ACLOCAL='${SHELL} /home/dyy/LibzdbForDM/config/missing aclocal-1.16'
 AMDEPBACKSLASH='\'
 AMDEP_FALSE='#'
 AMDEP_TRUE=''
@@ -2896,9 +2896,9 @@ AM_DEFAULT_V='$(AM_DEFAULT_VERBOSITY)'
 AM_DEFAULT_VERBOSITY='1'
 AM_V='$(V)'
 AR='ar'
-AUTOCONF='${SHELL} /home/dyy/libzdb-3.2.3/config/missing autoconf'
-AUTOHEADER='${SHELL} /home/dyy/libzdb-3.2.3/config/missing autoheader'
-AUTOMAKE='${SHELL} /home/dyy/libzdb-3.2.3/config/missing automake-1.16'
+AUTOCONF='${SHELL} /home/dyy/LibzdbForDM/config/missing autoconf'
+AUTOHEADER='${SHELL} /home/dyy/LibzdbForDM/config/missing autoheader'
+AUTOMAKE='${SHELL} /home/dyy/LibzdbForDM/config/missing automake-1.16'
 AWK='gawk'
 CC='gcc'
 CCDEPMODE='depmode=none'
@@ -2941,7 +2941,7 @@ LIPO=''
 LN_S='ln -s'
 LTLIBOBJS=''
 LT_SYS_LIBRARY_PATH=''
-MAKEINFO='${SHELL} /home/dyy/libzdb-3.2.3/config/missing makeinfo'
+MAKEINFO='${SHELL} /home/dyy/LibzdbForDM/config/missing makeinfo'
 MANIFEST_TOOL=':'
 MKDIR_P='/usr/bin/mkdir -p'
 MYSQLCONFIG='/usr/bin/mysql_config'
@@ -3014,7 +3014,7 @@ host_vendor='pc'
 htmldir='${docdir}'
 includedir='${prefix}/include'
 infodir='${datarootdir}/info'
-install_sh='${SHELL} /home/dyy/libzdb-3.2.3/config/install-sh'
+install_sh='${SHELL} /home/dyy/LibzdbForDM/config/install-sh'
 libdir='${exec_prefix}/lib'
 libexecdir='${exec_prefix}/libexec'
 localedir='${datarootdir}/locale'
@@ -3088,7 +3088,6 @@ config.status:1177: creating Makefile
 config.status:1177: creating test/Makefile
 config.status:1177: creating zdb.pc
 config.status:1177: creating src/xconfig.h
-config.status:1358: src/xconfig.h is unchanged
 config.status:1406: executing libtool_patch commands
 config.status:1406: executing depfiles commands
 config.status:1406: executing libtool commands
