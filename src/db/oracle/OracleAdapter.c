@@ -83,7 +83,6 @@ const char *OraclePreparedStatement_getLastError(int err, DCIError *errhp) {
                         return "Error - DCI_NODATA";
                         break;
                 case DCI_ERROR:
-                        printf("errorcode:%d\n");
                         DCIErrorGet(errhp, 1, NULL, &errcode, erb, STRLEN, DCI_HTYPE_ERROR);
                         return erb;
                         break;

@@ -238,7 +238,7 @@ static void _setBlob(T P, int parameterIndex, const void *x, int size) {
                 P->params[i].is_null = DCI_IND_NULL;
         }
         P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (void *)P->params[i].type.blob,
-                                    (int)P->params[i].length, SQLT_LNG, &P->params[i].is_null, 0, 0, 0, 0, DCI_DEFAULT);
+                                    (int)P->params[i].length, SQLT_LBI, NULL, NULL, NULL, NULL, NULL, DCI_DEFAULT);
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }

@@ -79,13 +79,11 @@ struct T {
 
 
 static bool _initaleDefiningBuffers(T R) {
-        printf("init buffers\n");
         ub2 dtype = 0;
         int deptlen;
         int sizelen = sizeof(deptlen);
         DCIParam* pard = NULL;
         sword status;
-        printf("column:%d\n",R->columnCount);
         for (int i = 1; i <= R->columnCount; i++) {
                 deptlen = 0;
                 /* The next two statements describe the select-list item, dname, and
@@ -94,7 +92,6 @@ static bool _initaleDefiningBuffers(T R) {
                 if (R->lastError != DCI_SUCCESS)
                         return false;
                 R->lastError = DCIAttrGet(pard, DCI_DTYPE_PARAM, &deptlen, &sizelen, DCI_ATTR_DATA_SIZE, R->err);
-                printf("deptlen:%d,sizelen:%d\n",deptlen,sizelen);
                 if (R->lastError != DCI_SUCCESS) {
                         // cannot get column's size, cleaning and returning
                         DCIDescriptorFree(pard, DCI_DTYPE_PARAM);
@@ -109,7 +106,7 @@ static bool _initaleDefiningBuffers(T R) {
                 switch(dtype)
                 {
                         case SQLT_BLOB:
-                                printf("SQLT_BLOB\n");
+                                // printf("blob get");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
@@ -119,7 +116,6 @@ static bool _initaleDefiningBuffers(T R) {
                                 break;
                                 
                         case SQLT_CLOB:
-                                printf("SQLT_CLOB\n");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
@@ -132,7 +128,7 @@ static bool _initaleDefiningBuffers(T R) {
                         case SQLT_TIMESTAMP:
                         case SQLT_TIMESTAMP_TZ:
                         case SQLT_TIMESTAMP_LTZ:
-                                printf("SQLT_TIMESTAMP_LTZ\n");
+                                // printf("SQLT_TIMESTAMP_LTZ\n");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].date),
                                                             (ub4) DCI_DTYPE_TIMESTAMP,
@@ -141,7 +137,7 @@ static bool _initaleDefiningBuffers(T R) {
                                                               &(R->columns[i-1].date), sizeof(R->columns[i-1].date), SQLT_TIMESTAMP, &(R->columns[i-1].isNull), 0, 0, DCI_DEFAULT);
                                 break;
                         default:
-                                printf("default\n");
+                                // printf("default\n");
                                 R->columns[i-1].lob_loc = NULL;
                                 R->columns[i-1].buffer = ALLOC(2*deptlen + 1);
                                 R->lastError = DCIDefineByPos(R->stmt, &R->columns[i-1].def, R->err, i,
