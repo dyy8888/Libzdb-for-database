@@ -348,7 +348,7 @@ CC = gcc
 CCDEPMODE = depmode=none
 CFLAGS = -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11
 CPP = gcc -E
-CPPFLAGS = -I/home/dyy/dci/include
+CPPFLAGS = -I/home/dyy/dci/include 
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=none

@@ -407,11 +407,11 @@ configure:5526: checking lex output file root
 configure:5540: result: lex.yy
 configure:5545: checking lex library
 configure:5559: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c   >&5
-/usr/bin/ld: /tmp/ccSQ7WWE.o: in function `input':
+/usr/bin/ld: /tmp/ccJ2mide.o: in function `input':
 /home/dyy/LibzdbForDM/lex.yy.c:1180: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccSQ7WWE.o: in function `yylex':
+/usr/bin/ld: /tmp/ccJ2mide.o: in function `yylex':
 /home/dyy/LibzdbForDM/lex.yy.c:871: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccSQ7WWE.o: in function `main':
+/usr/bin/ld: /tmp/ccJ2mide.o: in function `main':
 /home/dyy/LibzdbForDM/conftest.l:17: undefined reference to `yywrap'
 collect2: error: ld returned 1 exit status
 configure:5559: $? = 1
@@ -2493,7 +2493,7 @@ configure:12624: $? = 0
 configure:12624: result: yes
 configure:12638: checking for library containing pthread_create
 configure:12669: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c  >&5
-/usr/bin/ld: /tmp/cc3C2lml.o: in function `main':
+/usr/bin/ld: /tmp/cccOPi7W.o: in function `main':
 /home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
 configure:12669: $? = 1
@@ -2553,7 +2553,7 @@ configure:12838: checking for SQLite3
 configure:13004: result: yes
 configure:13006: checking for library containing sqlite3_open
 configure:13037: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c -lpthread  >&5
-/usr/bin/ld: /tmp/cc0mmd99.o: in function `main':
+/usr/bin/ld: /tmp/ccfEvvjN.o: in function `main':
 /home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `sqlite3_open'
 collect2: error: ld returned 1 exit status
 configure:13037: $? = 1
