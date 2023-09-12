@@ -123,7 +123,7 @@ T OraclePreparedStatement_new(Connection_T delegator, DCIStmt *stmt, DCIEnv *env
 
 
 static void _free(T *P) {
-	print("偷偷执行了free\n");
+	printf("偷偷执行了free\n");
         assert(P && *P);
         DCIHandleFree((*P)->stmt, DCI_HTYPE_STMT);
         if ((*P)->params) {
