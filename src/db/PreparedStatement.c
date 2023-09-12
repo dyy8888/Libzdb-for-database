@@ -53,8 +53,12 @@ struct PreparedStatement_S {
 
 
 static void _clearResultSet(T P) {
-        if (P->resultSet)
-                ResultSet_free(&P->resultSet);
+        if (P->resultSet){
+        printf("执行清除\n");
+         ResultSet_free(&P->resultSet);
+        }
+        	
+               
 }
 
 

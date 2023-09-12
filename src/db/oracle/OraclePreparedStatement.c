@@ -151,9 +151,10 @@ static void _setString(T P, int parameterIndex, const char *x) {
        
         P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
                                     (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, DCI_DEFAULT);
-         printf("在setstring中查看:%s,index:%d,绑定后的数组:%s\n",x,parameterIndex,(char *)P->params[i].type.string);
+         
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+        printf("在setstring中查看:%s,index:%d,绑定后的数组:%s\n",x,parameterIndex,(char *)P->params[i].type.string);
 }
 
 
@@ -248,16 +249,17 @@ static void _setBlob(T P, int parameterIndex, const void *x, int size) {
 
 
 static void _execute(T P) {
+	printf("执行前查看长度:%d\n",P->parameterCount);
+        for (int i=0;i<P->parameterCount;i++){
+                printf("执行前查看参数:%d:%s\n",i,(char *)P->params[i].type.string);
+        }
         assert(P);
         P->rowsChanged = 0;
         if (P->timeout > 0) {
                 P->countdown = P->timeout;
                 P->running = true;
         }
-        printf("执行前查看长度:%d\n",P->parameterCount);
-        for (int i=0;i<P->parameterCount;i++){
-                printf("执行前查看参数:%d:%s\n",i,(char *)P->params[i].type.string);
-        }
+        
         P->lastError = DCIStmtExecute(P->svc, P->stmt, P->err, 1, 0, NULL, NULL, DCI_DEFAULT);
         P->running = false;
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
