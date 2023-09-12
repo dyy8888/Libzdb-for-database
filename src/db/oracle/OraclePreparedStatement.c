@@ -258,7 +258,7 @@ static void _execute(T P) {
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
         P->lastError = DCIAttrGet( P->stmt, DCI_HTYPE_STMT, &P->rowsChanged, 0, DCI_ATTR_ROW_COUNT, P->err);
-           printf("execute中查看更改的行数:%d\n",P->rowsChanged);
+          printf("execute中查看返回码:%d\n",P->lastError);
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
