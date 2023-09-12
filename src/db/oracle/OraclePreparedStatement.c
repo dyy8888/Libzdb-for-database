@@ -140,6 +140,9 @@ static void _free(T *P) {
 static void _setString(T P, int parameterIndex, const char *x) {
         assert(P);
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
+        if (i==2){
+                printf("单独打印上一个参数的值:%s\n",(char *)P->params[i-1].type.string);
+        }
         P->params[i].type.string = x;
         if (x) {
                 P->params[i].length = (int)strlen(x);
