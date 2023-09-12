@@ -84,6 +84,7 @@ static bool _initaleDefiningBuffers(T R) {
         int sizelen = sizeof(deptlen);
         DCIParam* pard = NULL;
         sword status;
+        // printf("columnCount:%d\n", R->columnCount);
         for (int i = 1; i <= R->columnCount; i++) {
                 deptlen = 0;
                 /* The next two statements describe the select-list item, dname, and
@@ -101,21 +102,23 @@ static bool _initaleDefiningBuffers(T R) {
                 /* Use the retrieved length of dname to allocate an output buffer, and
                  then define the output variable. */
                 deptlen +=1;
+                // printf("查询deptlen:%d,查询dtype:%d\n",deptlen,dtype);
                 R->columns[i-1].length = deptlen;
                 R->columns[i-1].isNull = 0;
                 switch(dtype)
                 {
                         case SQLT_BLOB:
-                                // printf("blob get");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
                                                             (size_t) 0, (dvoid **) 0);
                                 R->lastError = DCIDefineByPos(R->stmt, &R->columns[i-1].def, R->err, i,
                                                               &(R->columns[i-1].lob_loc), deptlen, SQLT_BLOB, &(R->columns[i-1].isNull), 0, 0, DCI_DEFAULT);
+                                // printf("查看buffer的值:%s\n",R->columns[i-1].buffer);
                                 break;
                                 
                         case SQLT_CLOB:
+                                // printf("查询clob");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
@@ -142,6 +145,7 @@ static bool _initaleDefiningBuffers(T R) {
                                 R->columns[i-1].buffer = ALLOC(2*deptlen + 1);
                                 R->lastError = DCIDefineByPos(R->stmt, &R->columns[i-1].def, R->err, i,
                                                               R->columns[i-1].buffer, (2*deptlen+1), SQLT_STR, &(R->columns[i-1].isNull), 0, 0, DCI_DEFAULT);
+                                // printf("查看buffer的值:%s\n",R->columns[i-1].buffer);
                 }
                 {
                         char *col_name;
@@ -151,10 +155,12 @@ static bool _initaleDefiningBuffers(T R) {
                         R->lastError = DCIAttrGet(pard, DCI_DTYPE_PARAM, &col_name, &col_name_len, DCI_ATTR_NAME, R->err);
                         if (R->lastError != DCI_SUCCESS)
                                 continue;
+                        // printf("查看col_name：%s\n",col_name);
                         // column name could be non NULL terminated
                         // it is not allowed to do: col_name[col_name_len] = 0;
                         // so, copy the string
                         tmp_buffer = Str_ndup(col_name, col_name_len);
+                        // printf("查看buffer:%s\n",tmp_buffer);
 #if defined(ORACLE_COLUMN_NAME_LOWERCASE) && ORACLE_COLUMN_NAME_LOWERCASE > 1
                         R->columns[i-1].name = CALLOC(1, col_name_len+1);
                         DCIMultiByteStrCaseConversion(R->env, R->columns[i-1].name, tmp_buffer, DCI_NLS_LOWERCASE);
@@ -287,6 +293,7 @@ static long _getColumnSize(T R, int columnIndex) {
 static void _setFetchSize(T R, int rows) {
         assert(R);
         assert(rows > 0);
+        // printf("_setFetchSize查看rows:%d",rows);
         R->lastError = DCIAttrSet(R->stmt, DCI_HTYPE_STMT, (void*)&rows, (ub4)sizeof(ub4), DCI_ATTR_PREFETCH_ROWS, R->err);
         if (R->lastError != DCI_SUCCESS)
                 DEBUG("DCIAttrSet -- %s\n", OraclePreparedStatement_getLastError(R->lastError, R->err));
@@ -358,6 +365,8 @@ static const char *_getString(T R, int columnIndex) {
 
 static const void *_getBlob(T R, int columnIndex, int *size) {
         assert(R);
+        // printf("使用getblob方法\n");
+        // printf("==========%d查看索引值\n",columnIndex);
         int i = checkAndSetColumnIndex(columnIndex, R->columnCount);
         if (R->columns[i].isNull)
                 return NULL;
@@ -369,14 +378,17 @@ static const void *_getBlob(T R, int columnIndex, int *size) {
         R->columns[i].buffer = ALLOC(LOB_CHUNK_SIZE);
         *size = 0;
         ub1 piece = DCI_FIRST_PIECE;
+        // ub1 piece=;
         do {
                 read_bytes = 0;
                 read_chars = 0;
+                // SQLCS_IMPLICIT
                 R->lastError = DCILobRead2(R->svc, R->err, R->columns[i].lob_loc, &read_bytes, &read_chars, 1,
-                                           R->columns[i].buffer + total_bytes, LOB_CHUNK_SIZE, piece, NULL, NULL, 0, SQLCS_IMPLICIT);
+                                           R->columns[i].buffer + total_bytes, LOB_CHUNK_SIZE, piece, NULL, NULL, NULL, NULL);
                 if (read_bytes) {
                         total_bytes += read_bytes;
                         piece = DCI_NEXT_PIECE;
+                     
                         R->columns[i].buffer = RESIZE(R->columns[i].buffer, (long)(total_bytes + LOB_CHUNK_SIZE));
                 }
         } while (R->lastError == DCI_NEED_DATA);
@@ -386,6 +398,7 @@ static const void *_getBlob(T R, int columnIndex, int *size) {
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(R->lastError, R->err));
         }
         *size = R->columns[i].length = (int)total_bytes;
+        // printf("-------------------%s,%d\n",(char*)R->columns[i].buffer,R->columns[i].name);
         return (const void *)R->columns[i].buffer;
 }
 

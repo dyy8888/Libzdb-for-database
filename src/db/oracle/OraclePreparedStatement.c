@@ -262,6 +262,7 @@ static void _execute(T P) {
 
 
 static ResultSet_T _executeQuery(T P) {
+        // printf("执行查询函数\n");
         assert(P);
         P->rowsChanged = 0;
         if (P->timeout > 0) {

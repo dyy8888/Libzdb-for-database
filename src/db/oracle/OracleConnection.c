@@ -386,7 +386,7 @@ static bool _execute(T C, const char *sql, va_list ap) {
 
 
 static ResultSet_T _executeQuery(T C, const char *sql, va_list ap) {
-        // printf("executeQuery\n");
+        
         DCIStmt* stmtp;
         va_list  ap_copy;
         assert(C);
@@ -434,6 +434,7 @@ static PreparedStatement_T _prepareStatement(T C, const char *sql, va_list ap) {
         va_end(ap_copy);
         StringBuffer_trim(C->sb);
         StringBuffer_prepare4oracle(C->sb);
+        auto res=StringBuffer_toString(C->sb);
         /* Build statement */
         C->lastError = DCIHandleAlloc(C->env, (void **)&stmtp, DCI_HTYPE_STMT, 0, 0);
         if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
