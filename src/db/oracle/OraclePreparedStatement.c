@@ -253,6 +253,10 @@ static void _execute(T P) {
                 P->countdown = P->timeout;
                 P->running = true;
         }
+        printf("执行前查看长度:%d\n",P->parameterCount);
+        for (int i=0;i<P->parameterCount;i++){
+                printf("执行前查看参数:%d:%s\n",i,(char *)P->params[i].type.string);
+        }
         P->lastError = DCIStmtExecute(P->svc, P->stmt, P->err, 1, 0, NULL, NULL, DCI_DEFAULT);
         P->running = false;
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
