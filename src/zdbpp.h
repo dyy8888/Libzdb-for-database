@@ -347,8 +347,8 @@ namespace zdb {
             except_wrapper( PreparedStatement_setInt(t_, parameterIndex, x) );
         }
         
-        void setLLong(int parameterIndex, long long x) {
-            except_wrapper( PreparedStatement_setLLong(t_, parameterIndex, x) );
+        void setLLong(int parameterIndex, const char *x,int size) {
+            except_wrapper( PreparedStatement_setLLong(t_, parameterIndex, x,size) );
         }
         
         void setDouble(int parameterIndex, double x) {
@@ -395,8 +395,8 @@ namespace zdb {
             this->setInt(parameterIndex, x);
         }
         
-        void bind(int parameterIndex, long long x) {
-            this->setLLong(parameterIndex, x);
+        void bind(int parameterIndex, const char *x,int size) {
+            this->setLLong(parameterIndex, x,size);
         }
         
         void bind(int parameterIndex, double x) {

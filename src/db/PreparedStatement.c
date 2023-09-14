@@ -100,9 +100,9 @@ void PreparedStatement_setInt(T P, int parameterIndex, int x) {
 }
 
 
-void PreparedStatement_setLLong(T P, int parameterIndex, long long x) {
+void PreparedStatement_setLLong(T P, int parameterIndex, const char *x,int size) {
 	assert(P);
-        P->op->setLLong(P->D, parameterIndex, x);
+        P->op->setLLong(P->D, parameterIndex, x,size);
 }
 
 

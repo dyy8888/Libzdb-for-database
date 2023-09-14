@@ -108,6 +108,7 @@ static bool _initaleDefiningBuffers(T R) {
                 switch(dtype)
                 {
                         case SQLT_BLOB:
+                                printf("查询blob");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
@@ -118,7 +119,7 @@ static bool _initaleDefiningBuffers(T R) {
                                 break;
                                 
                         case SQLT_CLOB:
-                                // printf("查询clob");
+                                printf("查询clob");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
@@ -359,6 +360,7 @@ static const char *_getString(T R, int columnIndex) {
         }
         if (R->columns[i].buffer)
                 R->columns[i].buffer[R->columns[i].length] = 0;
+        printf("查看得到的string值:%s\n",R->columns[i].buffer);
         return R->columns[i].buffer;
 }
 
@@ -398,7 +400,7 @@ static const void *_getBlob(T R, int columnIndex, int *size) {
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(R->lastError, R->err));
         }
         *size = R->columns[i].length = (int)total_bytes;
-        // printf("-------------------%s,%d\n",(char*)R->columns[i].buffer,R->columns[i].name);
+        printf("-------------------%d,%d\n",R->columns[i].length,R->columns[i].name);
         return (const void *)R->columns[i].buffer;
 }
 

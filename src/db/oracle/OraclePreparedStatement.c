@@ -154,15 +154,42 @@ static void _setString(T P, int parameterIndex, const char *x) {
         
         P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
                                     (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, DCI_DEFAULT);
-        //printf("在setstring中查看:%s,index:%d,i的值:%d,绑定后的数组:%s\n",x,parameterIndex,i,(char *)P->params[i].type.string);
+        printf("在setstring中查看:,index:%d,i的值:%d,绑定后的数组长度:%d\n",parameterIndex,i,(char *)P->params[i].length);
         //if (i==2){
          //       printf("单独打印上一个参数的值:%s\n",(char *)P->params[i-1].type.string);
         //}
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        {        printf("异常\n");
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+        }
 }
 
-
+static void _setLLong(T P, int parameterIndex, const char *x,int size) {
+        assert(P);
+        int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
+       // if (i==2){
+        //        printf("单独打印上一个参数的值:%s\n",(char *)P->params[i-1].type.string);
+        //}
+        P->params[i].type.string = x;
+        if (x) {
+                P->params[i].length = (int)strlen(x);
+                P->params[i].is_null = DCI_IND_NOTNULL;
+        } else {
+                P->params[i].length = 0;
+                P->params[i].is_null = DCI_IND_NULL;
+        }
+        
+        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
+                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, DCI_DEFAULT);
+        printf("在setstring中查看:,index:%d,i的值:%d,绑定后的数组长度:%d\n",parameterIndex,i,(char *)P->params[i].length);
+        //if (i==2){
+         //       printf("单独打印上一个参数的值:%s\n",(char *)P->params[i-1].type.string);
+        //}
+        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        {        printf("异常\n");
+                THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+        }
+}
 static void _setTimestamp(T P, int parameterIndex, time_t time) {
         assert(P);
         struct tm ts = {.tm_isdst = -1};
@@ -209,18 +236,18 @@ static void _setInt(T P, int parameterIndex, int x) {
 }
 
 
-static void _setLLong(T P, int parameterIndex, long long x) {
-        assert(P);
-        int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
-        P->params[i].length = sizeof(P->params[i].type.number);
-        P->lastError = DCINumberFromInt(P->err, &x, sizeof(x), DCI_NUMBER_SIGNED, &P->params[i].type.number);
-        if (P->lastError != DCI_SUCCESS)
-                THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.number, 
-                                    (int)P->params[i].length, SQLT_VNU, 0, 0, 0, 0, 0, DCI_DEFAULT);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
-                THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-}
+// static void _setLLong(T P, int parameterIndex, long long x) {
+//         assert(P);
+//         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
+//         P->params[i].length = sizeof(P->params[i].type.number);
+//         P->lastError = DCINumberFromInt(P->err, &x, sizeof(x), DCI_NUMBER_SIGNED, &P->params[i].type.number);
+//         if (P->lastError != DCI_SUCCESS)
+//                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+//         P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.number, 
+//                                     (int)P->params[i].length, SQLT_VNU, 0, 0, 0, 0, 0, DCI_DEFAULT);
+//         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+//                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+// }
 
 
 static void _setDouble(T P, int parameterIndex, double x) {
@@ -247,32 +274,42 @@ static void _setBlob(T P, int parameterIndex, const void *x, int size) {
                 P->params[i].is_null = DCI_IND_NULL;
         }
         P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (void *)P->params[i].type.blob,
-                                    (int)P->params[i].length, SQLT_BIN, NULL, NULL, NULL, NULL, NULL, DCI_DEFAULT);
+                                    (int)P->params[i].length, SQLT_CLOB, NULL, NULL, NULL, NULL, NULL, DCI_DEFAULT);
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
 
 static void _execute(T P) {
-	//printf("执行前查看长度:%d\n",P->parameterCount);
-        //for (int i=0;i<P->parameterCount;i++){
-        //        printf("执行前查看参数:%d:%s\n",i,(char *)P->params[i].type.string);
-        //}
+	// printf("执行前查看长度:%d\n",P->parameterCount);
+        // for (int i=0;i<P->parameterCount;i++){
+        //        printf("执行前查看参数:%d:%d\n",i,P->params[i].length);
+        // }
         assert(P);
         P->rowsChanged = 0;
         if (P->timeout > 0) {
                 P->countdown = P->timeout;
                 P->running = true;
         }
-        
+     
         P->lastError = DCIStmtExecute(P->svc, P->stmt, P->err, 1, 0, NULL, NULL, DCI_DEFAULT);
+    
         P->running = false;
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        {
+                printf("exectue异常\n");
+                printf("execute中查看返回码:%d\n",P->lastError);
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+        }
+                
         P->lastError = DCIAttrGet( P->stmt, DCI_HTYPE_STMT, &P->rowsChanged, 0, DCI_ATTR_ROW_COUNT, P->err);
          // printf("execute中查看返回码:%d\n",P->lastError);
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        {
+                 printf("exectue111异常\n");
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+        }
+                
 }
 
 
