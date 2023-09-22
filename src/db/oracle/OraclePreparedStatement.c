@@ -154,12 +154,12 @@ static void _setString(T P, int parameterIndex, const char *x) {
         
         P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
                                     (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, DCI_DEFAULT);
-        printf("在setstring中查看:,index:%d,i的值:%d,绑定后的数组长度:%d\n",parameterIndex,i,(char *)P->params[i].length);
+        // printf("在setstring中查看:,index:%d,i的值:%d,绑定后的数组长度:%d\n",parameterIndex,i,(char *)P->params[i].length);
         //if (i==2){
          //       printf("单独打印上一个参数的值:%s\n",(char *)P->params[i-1].type.string);
         //}
         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
-        {        printf("异常\n");
+        {      
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
         }
 }

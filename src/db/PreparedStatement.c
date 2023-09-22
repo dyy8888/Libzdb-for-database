@@ -89,7 +89,7 @@ void PreparedStatement_free(T *P) {
 
 void PreparedStatement_setString(T P, int parameterIndex, const char *x) {
 	assert(P);
-	
+	printf("查看x的值:%s\n",x);
         P->op->setString(P->D, parameterIndex, x);
 }
 
