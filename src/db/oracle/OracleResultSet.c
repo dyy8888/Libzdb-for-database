@@ -69,7 +69,7 @@ struct T {
         Connection_T delegator;
 };
 #ifndef ORACLE_COLUMN_NAME_LOWERCASE
-#define ORACLE_COLUMN_NAME_LOWERCASE 2
+#define ORACLE_COLUMN_NAME_LOWERCASE 1
 #endif
 #define LOB_CHUNK_SIZE  2000
 #define DATE_STR_BUF_SIZE   255
@@ -84,7 +84,6 @@ static bool _initaleDefiningBuffers(T R) {
         int sizelen = sizeof(deptlen);
         DCIParam* pard = NULL;
         sword status;
-        // printf("columnCount:%d\n", R->columnCount);
         for (int i = 1; i <= R->columnCount; i++) {
                 deptlen = 0;
                 /* The next two statements describe the select-list item, dname, and
@@ -108,7 +107,7 @@ static bool _initaleDefiningBuffers(T R) {
                 switch(dtype)
                 {
                         case SQLT_BLOB:
-                                printf("查询blob");
+                                // printf("查询blob");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
@@ -119,13 +118,14 @@ static bool _initaleDefiningBuffers(T R) {
                                 break;
                                 
                         case SQLT_CLOB:
-                                printf("查询clob");
+                                // printf("查询clob");
                                 R->columns[i-1].buffer = NULL;
                                 status = DCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) DCI_DTYPE_LOB,
                                                             (size_t) 0, (dvoid **) 0);
                                 R->lastError = DCIDefineByPos(R->stmt, &R->columns[i-1].def, R->err, i,
                                                               &(R->columns[i-1].lob_loc), deptlen, SQLT_CLOB, &(R->columns[i-1].isNull), 0, 0, DCI_DEFAULT);
+                                // printf("查看buffer的值:%s\n",R->columns[i-1].buffer);
                                 break;
                         case SQLT_DAT:
                         case SQLT_DATE:
@@ -193,7 +193,7 @@ static bool _toString(T R, int i)
                                          fmt, strlen(fmt),
                                          0,
                                          NULL, 0,
-                                         (ub4*)&(R->columns[i].length), (OraText *)R->columns[i].buffer);
+                                         (ub4*)&(R->columns[i].length), (dutext *)R->columns[i].buffer);
         return ((R->lastError == DCI_SUCCESS) || (R->lastError == DCI_SUCCESS_WITH_INFO));;
 }
 
@@ -220,6 +220,7 @@ T OracleResultSet_new(Connection_T delegator, DCIStmt *stmt, DCIEnv *env, DCISes
         R->freeStatement = need_free;
         /* Get the number of columns in the select list */
         R->lastError = DCIAttrGet (R->stmt, DCI_HTYPE_STMT, &R->columnCount, NULL, DCI_ATTR_PARAM_COUNT, R->err);
+        // printf("%d\n",R->columnCount);
         if (R->lastError != DCI_SUCCESS && R->lastError != DCI_SUCCESS_WITH_INFO)
                 DEBUG("_new: Error %d, '%s'\n", R->lastError, OraclePreparedStatement_getLastError(R->lastError,R->err));
         R->columns = CALLOC(R->columnCount, sizeof (struct column_t));

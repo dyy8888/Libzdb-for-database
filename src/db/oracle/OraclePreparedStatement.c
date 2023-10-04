@@ -208,7 +208,7 @@ static void _setTimestamp(T P, int parameterIndex, time_t time) {
                              P->err,
                              P->params[i].type.date, //DCIDateTime   *datetime,
                              ts.tm_year+1900, ts.tm_mon+1, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec, 0/*fsec*/,
-                             (OraText*)0, 0);
+                             (dmtext*)0, 0);
         
         if (DCI_SUCCESS != DCIDateTimeCheck(P->usr, P->err, P->params[i].type.date, &valid) || valid != 0)
         {
@@ -281,10 +281,6 @@ static void _setBlob(T P, int parameterIndex, const void *x, int size) {
 
 
 static void _execute(T P) {
-	// printf("执行前查看长度:%d\n",P->parameterCount);
-        // for (int i=0;i<P->parameterCount;i++){
-        //        printf("执行前查看参数:%d:%d\n",i,P->params[i].length);
-        // }
         assert(P);
         P->rowsChanged = 0;
         if (P->timeout > 0) {
@@ -314,7 +310,6 @@ static void _execute(T P) {
 
 
 static ResultSet_T _executeQuery(T P) {
-        // printf("执行查询函数\n");
         assert(P);
         P->rowsChanged = 0;
         if (P->timeout > 0) {

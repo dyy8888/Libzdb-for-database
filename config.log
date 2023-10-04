@@ -29,9 +29,6 @@ uname -v = #93~20.04.1-Ubuntu SMP Wed Sep 6 16:15:40 UTC 2023
 
 PATH: /home/dyy/.local/share/umake/bin
 PATH: /home/dyy/.local/bin
-PATH: /home/dyy/.nvm/versions/node/v16.14.0/bin
-PATH: /home/dyy/.local/share/umake/bin
-PATH: /home/dyy/.local/bin
 PATH: /usr/local/sbin
 PATH: /usr/local/bin
 PATH: /usr/sbin
@@ -42,9 +39,6 @@ PATH: /usr/games
 PATH: /usr/local/games
 PATH: /snap/bin
 PATH: /usr/local/go/bin
-PATH: /usr/local/go/bin
-PATH: /bin
-PATH: /home/dyy/typora
 
 
 ## ----------- ##
@@ -407,11 +401,11 @@ configure:5526: checking lex output file root
 configure:5540: result: lex.yy
 configure:5545: checking lex library
 configure:5559: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c   >&5
-/usr/bin/ld: /tmp/ccjPGmBs.o: in function `input':
+/usr/bin/ld: /tmp/ccGBaOpO.o: in function `input':
 /home/dyy/LibzdbForDM/lex.yy.c:1180: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccjPGmBs.o: in function `yylex':
+/usr/bin/ld: /tmp/ccGBaOpO.o: in function `yylex':
 /home/dyy/LibzdbForDM/lex.yy.c:871: undefined reference to `yywrap'
-/usr/bin/ld: /tmp/ccjPGmBs.o: in function `main':
+/usr/bin/ld: /tmp/ccGBaOpO.o: in function `main':
 /home/dyy/LibzdbForDM/conftest.l:17: undefined reference to `yywrap'
 collect2: error: ld returned 1 exit status
 configure:5559: $? = 1
@@ -2493,7 +2487,7 @@ configure:12624: $? = 0
 configure:12624: result: yes
 configure:12638: checking for library containing pthread_create
 configure:12669: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c  >&5
-/usr/bin/ld: /tmp/ccRBxEtb.o: in function `main':
+/usr/bin/ld: /tmp/ccBxESnA.o: in function `main':
 /home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
 configure:12669: $? = 1
@@ -2553,7 +2547,7 @@ configure:12838: checking for SQLite3
 configure:13004: result: yes
 configure:13006: checking for library containing sqlite3_open
 configure:13037: gcc -o conftest -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11   conftest.c -lpthread  >&5
-/usr/bin/ld: /tmp/ccvHQIA2.o: in function `main':
+/usr/bin/ld: /tmp/ccNuUJJm.o: in function `main':
 /home/dyy/LibzdbForDM/conftest.c:40: undefined reference to `sqlite3_open'
 collect2: error: ld returned 1 exit status
 configure:13037: $? = 1
@@ -3088,7 +3082,6 @@ config.status:1177: creating Makefile
 config.status:1177: creating test/Makefile
 config.status:1177: creating zdb.pc
 config.status:1177: creating src/xconfig.h
-config.status:1358: src/xconfig.h is unchanged
 config.status:1406: executing libtool_patch commands
 config.status:1406: executing depfiles commands
 config.status:1406: executing libtool commands
