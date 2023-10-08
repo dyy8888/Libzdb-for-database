@@ -51,12 +51,12 @@
 #define T ConnectionDelegate_T
 struct T {
         Connection_T   delegator;
-        DCIEnv*        env;
-        DCIError*      err;
-        DCISvcCtx*     svc;
-        DCISession*    usr;
-        DCIServer*     srv;
-        DCITrans*      txnhp;
+        OCIEnv*        env;
+        OCIError*      err;
+        OCISvcCtx*     svc;
+        OCISession*    usr;
+        OCIServer*     srv;
+        OCITrans*      txnhp;
         char           erb[ERB_SIZE];
         int            maxRows;
         int            timeout;
@@ -78,29 +78,29 @@ static const char *_getErrorDescription(T C) {
         sb4 errcode;
         switch (C->lastError)
         {
-                case DCI_SUCCESS:
+                case OCI_SUCCESS:
                         return "";
-                case DCI_SUCCESS_WITH_INFO:
-                        return "Info - DCI_SUCCESS_WITH_INFO";
+                case OCI_SUCCESS_WITH_INFO:
+                        return "Info - OCI_SUCCESS_WITH_INFO";
                         break;
-                case DCI_NEED_DATA:
-                        return "Error - DCI_NEED_DATA";
+                case OCI_NEED_DATA:
+                        return "Error - OCI_NEED_DATA";
                         break;
-                case DCI_NO_DATA:
-                        return "Error - DCI_NODATA";
+                case OCI_NO_DATA:
+                        return "Error - OCI_NODATA";
                         break;
-                case DCI_ERROR:
-                        (void) DCIErrorGet(C->err, 1, NULL, &errcode, C->erb, (ub4)ERB_SIZE, DCI_HTYPE_ERROR);
+                case OCI_ERROR:
+                        (void) OCIErrorGet(C->err, 1, NULL, &errcode, C->erb, (ub4)ERB_SIZE, OCI_HTYPE_ERROR);
                         return C->erb;
                         break;
-                case DCI_INVALID_HANDLE:
-                        return "Error - DCI_INVALID_HANDLE";
+                case OCI_INVALID_HANDLE:
+                        return "Error - OCI_INVALID_HANDLE";
                         break;
-                case DCI_STILL_EXECUTING:
-                        return "Error - DCI_STILL_EXECUTE";
+                case OCI_STILL_EXECUTING:
+                        return "Error - OCI_STILL_EXECUTE";
                         break;
-                case DCI_CONTINUE:
-                        return "Error - DCI_CONTINUE";
+                case OCI_CONTINUE:
+                        return "Error - OCI_CONTINUE";
                         break;
                 default:
                         break;
@@ -126,24 +126,24 @@ static bool _doConnect(T C, char**  error) {
                 ERROR("no Service Name specified in URL");
         ++servicename;
         // printf("servicename:%s,username:%s,password:%s\n",servicename,username,password);
-        /* Create a thread-safe DCI environment with N' substitution turned on. */
-        if (DCIEnvCreate(&C->env, DCI_THREADED | DCI_OBJECT | DCI_NCHAR_LITERAL_REPLACE_ON, 0, 0, 0, 0, 0, 0))
+        /* Create a thread-safe OCI environment with N' substitution turned on. */
+        if (OCIEnvCreate(&C->env, OCI_THREADED | OCI_OBJECT | OCI_NCHAR_LITERAL_REPLACE_ON, 0, 0, 0, 0, 0, 0))
         {
-                ERROR("Create a DCI environment failed");
+                ERROR("Create a OCI environment failed");
         }   
         /* allocate an error handle */
-        if (DCI_SUCCESS != DCIHandleAlloc(C->env, (dvoid**)&C->err, DCI_HTYPE_ERROR, 0, 0))
+        if (OCI_SUCCESS != OCIHandleAlloc(C->env, (dvoid**)&C->err, OCI_HTYPE_ERROR, 0, 0))
         {
                 ERROR("Allocating error handler failed");
         }      
         /* server contexts */
-        if (DCI_SUCCESS != DCIHandleAlloc(C->env, (dvoid**)&C->srv, DCI_HTYPE_SERVER, 0, 0))
+        if (OCI_SUCCESS != OCIHandleAlloc(C->env, (dvoid**)&C->srv, OCI_HTYPE_SERVER, 0, 0))
         {
                 ERROR("Allocating server context failed");
         }
                
         /* allocate a service handle */
-        if (DCI_SUCCESS != DCIHandleAlloc(C->env, (dvoid**)&C->svc, DCI_HTYPE_SVCCTX, 0, 0))
+        if (OCI_SUCCESS != OCIHandleAlloc(C->env, (dvoid**)&C->svc, OCI_HTYPE_SVCCTX, 0, 0))
         {
                 ERROR("Allocating service handle failed");
         }
@@ -166,45 +166,45 @@ static bool _doConnect(T C, char**  error) {
                 Connection_setFetchSize(C->delegator, rows);
         }
         /* Create a server context */
-        // C->lastError = DCIServerAttach(C->srv, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), DCI_DEFAULT);
+        // C->lastError = OCIServerAttach(C->srv, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), OCI_DEFAULT);
         // char str=StringBuffer_toString(C->sb);
-        C->lastError = DCIServerAttach(C->srv, C->err, host, (sb4)strlen(host), DCI_DEFAULT);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIServerAttach(C->srv, C->err, host, (sb4)strlen(host), OCI_DEFAULT);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
         {
                 ORAERROR(C);
         }  
         /* Set attribute server context in the service context */
-        C->lastError = DCIAttrSet(C->svc, DCI_HTYPE_SVCCTX, C->srv, 0, DCI_ATTR_SERVER, C->err);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIAttrSet(C->svc, OCI_HTYPE_SVCCTX, C->srv, 0, OCI_ATTR_SERVER, C->err);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
         {
                 ORAERROR(C);
         }    
-        C->lastError = DCIHandleAlloc(C->env, (void**)&C->usr, DCI_HTYPE_SESSION, 0, NULL);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIHandleAlloc(C->env, (void**)&C->usr, OCI_HTYPE_SESSION, 0, NULL);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
         {
                 ORAERROR(C);
         }      
-        C->lastError = DCIAttrSet(C->usr, DCI_HTYPE_SESSION, (dvoid *)username, (int)strlen(username), DCI_ATTR_USERNAME, C->err);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIAttrSet(C->usr, OCI_HTYPE_SESSION, (dvoid *)username, (int)strlen(username), OCI_ATTR_USERNAME, C->err);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
         {
                 ORAERROR(C);
         }    
-        C->lastError = DCIAttrSet(C->usr, DCI_HTYPE_SESSION, (dvoid *)password, (int)strlen(password), DCI_ATTR_PASSWORD, C->err);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIAttrSet(C->usr, OCI_HTYPE_SESSION, (dvoid *)password, (int)strlen(password), OCI_ATTR_PASSWORD, C->err);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
         {
                 ORAERROR(C);
         }      
-        ub4 sessionFlags = DCI_DEFAULT;
+        ub4 sessionFlags = OCI_DEFAULT;
         if (IS(URL_getParameter(url, "SYSDBA"), "true")) {
-                sessionFlags |= DCI_SYSDBA;
+                sessionFlags |= OCI_SYSDBA;
         }
         // printf("%d\n",sessionFlags);
-        C->lastError = DCISessionBegin(C->svc, C->err, C->usr, DCI_CRED_RDBMS, sessionFlags);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCISessionBegin(C->svc, C->err, C->usr, OCI_CRED_RDBMS, sessionFlags);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
         {
                 ORAERROR(C);
         }
-        DCIAttrSet(C->svc, DCI_HTYPE_SVCCTX, C->usr, 0, DCI_ATTR_SESSION, C->err);
+        OCIAttrSet(C->svc, OCI_HTYPE_SVCCTX, C->usr, 0, OCI_ATTR_SESSION, C->err);
         return true;
 }
 
@@ -222,13 +222,13 @@ static const char *_getLastError(T C) {
 static void _free(T* C) {
         assert(C && *C);
         if ((*C)->svc) {
-                DCISessionEnd((*C)->svc, (*C)->err, (*C)->usr, DCI_DEFAULT);
+                OCISessionEnd((*C)->svc, (*C)->err, (*C)->usr, OCI_DEFAULT);
                 (*C)->svc = NULL;
         }
         if ((*C)->srv)
-                DCIServerDetach((*C)->srv, (*C)->err, DCI_DEFAULT);
+                OCIServerDetach((*C)->srv, (*C)->err, OCI_DEFAULT);
         if ((*C)->env)
-                DCIHandleFree((*C)->env, DCI_HTYPE_ENV);
+                OCIHandleFree((*C)->env, OCI_HTYPE_ENV);
         StringBuffer_free(&((*C)->sb));
         if ((*C)->watchdog)
             Thread_join((*C)->watchdog);
@@ -255,8 +255,8 @@ static T _new(Connection_T delegator, char **error) {
 
 static bool _ping(T C) {
         assert(C);
-        C->lastError = DCIPing(C->svc, C->err, DCI_DEFAULT);
-        return (C->lastError == DCI_SUCCESS);
+        C->lastError = OCIPing(C->svc, C->err, OCI_DEFAULT);
+        return (C->lastError == OCI_SUCCESS);
 }
 
 
@@ -270,7 +270,7 @@ static void _setQueryTimeout(T C, int ms) {
                 }
         } else {
                 if (C->watchdog) {
-                        DCISvcCtx* t = C->svc;
+                        OCISvcCtx* t = C->svc;
                         C->svc = NULL;
                         Thread_join(C->watchdog);
                         C->svc = t;
@@ -285,27 +285,27 @@ static bool _beginTransaction(T C) {
         if (C->txnhp == NULL) /* Allocate handler only once, if it is necessary */
         {
             /* allocate transaction handle and set it in the service handle */
-            C->lastError = DCIHandleAlloc(C->env, (void **)&C->txnhp, DCI_HTYPE_TRANS, 0, 0);
-            if (C->lastError != DCI_SUCCESS) 
+            C->lastError = OCIHandleAlloc(C->env, (void **)&C->txnhp, OCI_HTYPE_TRANS, 0, 0);
+            if (C->lastError != OCI_SUCCESS) 
                 return false;
-            DCIAttrSet(C->svc, DCI_HTYPE_SVCCTX, (void *)C->txnhp, 0, DCI_ATTR_TRANS, C->err);
+            OCIAttrSet(C->svc, OCI_HTYPE_SVCCTX, (void *)C->txnhp, 0, OCI_ATTR_TRANS, C->err);
         }
-        C->lastError = DCITransStart (C->svc, C->err, ORACLE_TRANSACTION_PERIOD, DCI_TRANS_NEW);
-        return (C->lastError == DCI_SUCCESS);
+        C->lastError = OCITransStart (C->svc, C->err, ORACLE_TRANSACTION_PERIOD, OCI_TRANS_NEW);
+        return (C->lastError == OCI_SUCCESS);
 }
 
 
 static bool _commit(T C) {
         assert(C);
-        C->lastError = DCITransCommit(C->svc, C->err, DCI_DEFAULT);
-        return C->lastError == DCI_SUCCESS;
+        C->lastError = OCITransCommit(C->svc, C->err, OCI_DEFAULT);
+        return C->lastError == OCI_SUCCESS;
 }
 
 
 static bool _rollback(T C) {
         assert(C);
-        C->lastError = DCITransRollback(C->svc, C->err, DCI_DEFAULT);
-        return C->lastError == DCI_SUCCESS;
+        C->lastError = OCITransRollback(C->svc, C->err, OCI_DEFAULT);
+        return C->lastError == OCI_SUCCESS;
 }
 
 
@@ -316,24 +316,24 @@ static long long _lastRowId(T C) {
          so, currently I leave it unimplemented
          */
         
-        /*     DCIRowid* rowid; */
-        /*     DCIDescriptorAlloc((dvoid *)C->env,  */
+        /*     OCIRowid* rowid; */
+        /*     OCIDescriptorAlloc((dvoid *)C->env,  */
         /*                        (dvoid **)&rowid, */
-        /*                        (ub4) DCI_DTYPE_ROWID,  */
+        /*                        (ub4) OCI_DTYPE_ROWID,  */
         /*                        (size_t) 0, (dvoid **) 0); */
         
-        /*     if (DCIAttrGet (select_p, */
-        /*                     DCI_HTYPE_STMT, */
+        /*     if (OCIAttrGet (select_p, */
+        /*                     OCI_HTYPE_STMT, */
         /*                     &rowid,              /\* get the current rowid *\/ */
         /*                     0, */
-        /*                     DCI_ATTR_ROWID, */
+        /*                     OCI_ATTR_ROWID, */
         /*                     errhp)) */
         /*     { */
         /*         printf ("Getting the Rowid failed \n"); */
-        /*         return (DCI_ERROR); */
+        /*         return (OCI_ERROR); */
         /*     } */
         
-        /*     DCIDescriptorFree(rowid, DCI_DTYPE_ROWID); */
+        /*     OCIDescriptorFree(rowid, OCI_DTYPE_ROWID); */
         DEBUG("OracleConnection_lastRowId: Not implemented yet");
         return -1;
 }
@@ -346,7 +346,7 @@ static long long _rowsChanged(T C) {
 
 
 static bool _execute(T C, const char *sql, va_list ap) {
-        DCIStmt* stmtp;
+        OCIStmt* stmtp;
         va_list ap_copy;
         assert(C);
         C->rowsChanged = 0;
@@ -355,12 +355,12 @@ static bool _execute(T C, const char *sql, va_list ap) {
         va_end(ap_copy);
         StringBuffer_trim(C->sb);
         /* Build statement */
-        C->lastError = DCIHandleAlloc(C->env, (void **)&stmtp, DCI_HTYPE_STMT, 0, NULL);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIHandleAlloc(C->env, (void **)&stmtp, OCI_HTYPE_STMT, 0, NULL);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
                 return false;
-        C->lastError = DCIStmtPrepare(stmtp, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), DCI_NTV_SYNTAX, DCI_DEFAULT);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO) {
-                DCIHandleFree(stmtp, DCI_HTYPE_STMT);
+        C->lastError = OCIStmtPrepare(stmtp, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), OCI_NTV_SYNTAX, OCI_DEFAULT);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO) {
+                OCIHandleFree(stmtp, OCI_HTYPE_STMT);
                 return false;
         }
         /* Execute */
@@ -368,26 +368,26 @@ static bool _execute(T C, const char *sql, va_list ap) {
                 C->countdown = C->timeout;
                 C->running = true;
         }
-        C->lastError = DCIStmtExecute(C->svc, stmtp, C->err, 1, 0, NULL, NULL, DCI_DEFAULT);
+        C->lastError = OCIStmtExecute(C->svc, stmtp, C->err, 1, 0, NULL, NULL, OCI_DEFAULT);
         C->running = false;
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO) {
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO) {
                 ub4 parmcnt = 0;
-                DCIAttrGet(stmtp, DCI_HTYPE_STMT, &parmcnt, NULL, DCI_ATTR_PARSE_ERROR_OFFSET, C->err);
+                OCIAttrGet(stmtp, OCI_HTYPE_STMT, &parmcnt, NULL, OCI_ATTR_PARSE_ERROR_OFFSET, C->err);
                 DEBUG("Error occured in StmtExecute %d (%s), offset is %d\n", C->lastError, _getLastError(C), parmcnt);
-                DCIHandleFree(stmtp, DCI_HTYPE_STMT);
+                OCIHandleFree(stmtp, OCI_HTYPE_STMT);
                 return false;
         }
-        C->lastError = DCIAttrGet(stmtp, DCI_HTYPE_STMT, &C->rowsChanged, 0, DCI_ATTR_ROW_COUNT, C->err);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
-                DEBUG("OracleConnection_execute: Error in DCIAttrGet %d (%s)\n", C->lastError, _getLastError(C));
-        DCIHandleFree(stmtp, DCI_HTYPE_STMT);
-        return C->lastError == DCI_SUCCESS;
+        C->lastError = OCIAttrGet(stmtp, OCI_HTYPE_STMT, &C->rowsChanged, 0, OCI_ATTR_ROW_COUNT, C->err);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
+                DEBUG("OracleConnection_execute: Error in OCIAttrGet %d (%s)\n", C->lastError, _getLastError(C));
+        OCIHandleFree(stmtp, OCI_HTYPE_STMT);
+        return C->lastError == OCI_SUCCESS;
 }
 
 
 static ResultSet_T _executeQuery(T C, const char *sql, va_list ap) {
         
-        DCIStmt* stmtp;
+        OCIStmt* stmtp;
         va_list  ap_copy;
         assert(C);
         C->rowsChanged = 0;
@@ -396,12 +396,12 @@ static ResultSet_T _executeQuery(T C, const char *sql, va_list ap) {
         va_end(ap_copy);
         StringBuffer_trim(C->sb);
         /* Build statement */
-        C->lastError = DCIHandleAlloc(C->env, (void **)&stmtp, DCI_HTYPE_STMT, 0, NULL);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIHandleAlloc(C->env, (void **)&stmtp, OCI_HTYPE_STMT, 0, NULL);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
                 return NULL;
-        C->lastError = DCIStmtPrepare(stmtp, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), DCI_NTV_SYNTAX, DCI_DEFAULT);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO) {
-                DCIHandleFree(stmtp, DCI_HTYPE_STMT);
+        C->lastError = OCIStmtPrepare(stmtp, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), OCI_NTV_SYNTAX, OCI_DEFAULT);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO) {
+                OCIHandleFree(stmtp, OCI_HTYPE_STMT);
                 return NULL;
         }
         /* Execute and create Result Set */
@@ -409,24 +409,24 @@ static ResultSet_T _executeQuery(T C, const char *sql, va_list ap) {
                 C->countdown = C->timeout;
                 C->running = true;
         }
-        C->lastError = DCIStmtExecute(C->svc, stmtp, C->err, 0, 0, NULL, NULL, DCI_DEFAULT);
+        C->lastError = OCIStmtExecute(C->svc, stmtp, C->err, 0, 0, NULL, NULL, OCI_DEFAULT);
         C->running = false;
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO) {
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO) {
                 ub4 parmcnt = 0;
-                DCIAttrGet(stmtp, DCI_HTYPE_STMT, &parmcnt, NULL, DCI_ATTR_PARSE_ERROR_OFFSET, C->err);
+                OCIAttrGet(stmtp, OCI_HTYPE_STMT, &parmcnt, NULL, OCI_ATTR_PARSE_ERROR_OFFSET, C->err);
                 DEBUG("Error occured in StmtExecute %d (%s), offset is %d\n", C->lastError, _getLastError(C), parmcnt);
-                DCIHandleFree(stmtp, DCI_HTYPE_STMT);
+                OCIHandleFree(stmtp, OCI_HTYPE_STMT);
                 return NULL;
         }
-        C->lastError = DCIAttrGet(stmtp, DCI_HTYPE_STMT, &C->rowsChanged, 0, DCI_ATTR_ROW_COUNT, C->err);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
-                DEBUG("OracleConnection_execute: Error in DCIAttrGet %d (%s)\n", C->lastError, _getLastError(C));
+        C->lastError = OCIAttrGet(stmtp, OCI_HTYPE_STMT, &C->rowsChanged, 0, OCI_ATTR_ROW_COUNT, C->err);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
+                DEBUG("OracleConnection_execute: Error in OCIAttrGet %d (%s)\n", C->lastError, _getLastError(C));
         return ResultSet_new(OracleResultSet_new(C->delegator, stmtp, C->env, C->usr, C->err, C->svc, true), (Rop_T)&oraclerops);
 }
 
 
 static PreparedStatement_T _prepareStatement(T C, const char *sql, va_list ap) {
-        DCIStmt *stmtp;
+        OCIStmt *stmtp;
         va_list ap_copy;
         assert(C);
         va_copy(ap_copy, ap);
@@ -436,12 +436,12 @@ static PreparedStatement_T _prepareStatement(T C, const char *sql, va_list ap) {
         StringBuffer_prepare4oracle(C->sb);
         auto res=StringBuffer_toString(C->sb);
         /* Build statement */
-        C->lastError = DCIHandleAlloc(C->env, (void **)&stmtp, DCI_HTYPE_STMT, 0, 0);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO)
+        C->lastError = OCIHandleAlloc(C->env, (void **)&stmtp, OCI_HTYPE_STMT, 0, 0);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
                 return NULL;
-        C->lastError = DCIStmtPrepare(stmtp, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), DCI_NTV_SYNTAX, DCI_DEFAULT);
-        if (C->lastError != DCI_SUCCESS && C->lastError != DCI_SUCCESS_WITH_INFO) {
-                DCIHandleFree(stmtp, DCI_HTYPE_STMT);
+        C->lastError = OCIStmtPrepare(stmtp, C->err, StringBuffer_toString(C->sb), StringBuffer_length(C->sb), OCI_NTV_SYNTAX, OCI_DEFAULT);
+        if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO) {
+                OCIHandleFree(stmtp, OCI_HTYPE_STMT);
                 return NULL;
         }
         return PreparedStatement_new(OraclePreparedStatement_new(C->delegator, stmtp, C->env, C->usr, C->err, C->svc), (Pop_T)&oraclepops);

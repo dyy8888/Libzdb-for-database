@@ -5,7 +5,7 @@
  * Copyright (C) Tildeslash Ltd. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and assDCIated documentation files (the "Software"), to deal
+ * of this software and assOCIated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -53,23 +53,23 @@ typedef struct param_t {
                 long integer;
                 const void *blob;
                 const char *string;
-                DCINumber number;
-                DCIDateTime* date;
+                OCINumber number;
+                OCIDateTime* date;
         } type;
-        DCIInd is_null;
+        OCIInd is_null;
         int length;
-        DCIBind* bind;
+        OCIBind* bind;
 } *param_t;
 #define T PreparedStatementDelegate_T
 struct T {
         int         timeout;
         int         countdown;
         ub4         parameterCount;
-        DCISession* usr;
-        DCIStmt*    stmt;
-        DCIEnv*     env;
-        DCIError*   err;
-        DCISvcCtx*  svc;
+        OCISession* usr;
+        OCIStmt*    stmt;
+        OCIEnv*     env;
+        OCIError*   err;
+        OCISvcCtx*  svc;
         param_t     params;
         sword       lastError;
         Thread_T    watchdog;
@@ -89,7 +89,7 @@ WATCHDOG(watchdog, T)
 /* ------------------------------------------------------------- Constructor */
 
 
-T OraclePreparedStatement_new(Connection_T delegator, DCIStmt *stmt, DCIEnv *env, DCISession* usr, DCIError *err, DCISvcCtx *svc) {
+T OraclePreparedStatement_new(Connection_T delegator, OCIStmt *stmt, OCIEnv *env, OCISession* usr, OCIError *err, OCISvcCtx *svc) {
         T P;
         assert(stmt);
         assert(env);
@@ -103,11 +103,11 @@ T OraclePreparedStatement_new(Connection_T delegator, DCIStmt *stmt, DCIEnv *env
         P->svc  = svc;
         P->usr  = usr; 
         P->timeout = Connection_getQueryTimeout(P->delegator);
-        P->lastError = DCI_SUCCESS;
+        P->lastError = OCI_SUCCESS;
         P->rowsChanged = 0;
         /* parameterCount */
-        P->lastError = DCIAttrGet(P->stmt, DCI_HTYPE_STMT, &P->parameterCount, NULL, DCI_ATTR_BIND_COUNT, P->err);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        P->lastError = OCIAttrGet(P->stmt, OCI_HTYPE_STMT, &P->parameterCount, NULL, OCI_ATTR_BIND_COUNT, P->err);
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
                 P->parameterCount = 0;
         if (P->parameterCount)
                 P->params = CALLOC(P->parameterCount, sizeof(struct param_t));
@@ -125,7 +125,7 @@ T OraclePreparedStatement_new(Connection_T delegator, DCIStmt *stmt, DCIEnv *env
 static void _free(T *P) {
 	//printf("偷偷执行了free\n");
         assert(P && *P);
-        DCIHandleFree((*P)->stmt, DCI_HTYPE_STMT);
+        OCIHandleFree((*P)->stmt, OCI_HTYPE_STMT);
         if ((*P)->params) {
                 // (*P)->params[i].bind is freed implicitly when the statement handle is deallocated
                 FREE((*P)->params);
@@ -146,19 +146,19 @@ static void _setString(T P, int parameterIndex, const char *x) {
         P->params[i].type.string = x;
         if (x) {
                 P->params[i].length = (int)strlen(x);
-                P->params[i].is_null = DCI_IND_NOTNULL;
+                P->params[i].is_null = OCI_IND_NOTNULL;
         } else {
                 P->params[i].length = 0;
-                P->params[i].is_null = DCI_IND_NULL;
+                P->params[i].is_null = OCI_IND_NULL;
         }
         
-        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
-                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, DCI_DEFAULT);
+        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
+                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, OCI_DEFAULT);
         printf("在setstring中查看:,index:%d,i的值:%d,绑定后的内容:%s\n",parameterIndex,i,(char *)P->params[i].type.string);
         if (i==2){
                printf("i==2单独打印上一个参数的值:%s\n",(char *)P->params[i-1].type.string);
         }
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
         {      
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
         }
@@ -173,19 +173,19 @@ static void _setLLong(T P, int parameterIndex, const char *x,int size) {
         P->params[i].type.string = x;
         if (x) {
                 P->params[i].length = (int)strlen(x);
-                P->params[i].is_null = DCI_IND_NOTNULL;
+                P->params[i].is_null = OCI_IND_NOTNULL;
         } else {
                 P->params[i].length = 0;
-                P->params[i].is_null = DCI_IND_NULL;
+                P->params[i].is_null = OCI_IND_NULL;
         }
         
-        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
-                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, DCI_DEFAULT);
+        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
+                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, OCI_DEFAULT);
         printf("在setstring中查看:,index:%d,i的值:%d,绑定后的数组长度:%d\n",parameterIndex,i,(char *)P->params[i].length);
         //if (i==2){
          //       printf("单独打印上一个参数的值:%s\n",(char *)P->params[i-1].type.string);
         //}
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
         {        printf("异常\n");
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
         }
@@ -196,30 +196,30 @@ static void _setTimestamp(T P, int parameterIndex, time_t time) {
         ub4   valid;
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
 
-        P->lastError = DCIDescriptorAlloc((dvoid *)P->env, (dvoid **) &(P->params[i].type.date),
-                                          (ub4) DCI_DTYPE_TIMESTAMP,
+        P->lastError = OCIDescriptorAlloc((dvoid *)P->env, (dvoid **) &(P->params[i].type.date),
+                                          (ub4) OCI_DTYPE_TIMESTAMP,
                                           (size_t) 0, (dvoid **) 0);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 
         gmtime_r(&time, &ts);
 
-        DCIDateTimeConstruct(P->usr,
+        OCIDateTimeConstruct(P->usr,
                              P->err,
-                             P->params[i].type.date, //DCIDateTime   *datetime,
+                             P->params[i].type.date, //OCIDateTime   *datetime,
                              ts.tm_year+1900, ts.tm_mon+1, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec, 0/*fsec*/,
                              (dmtext*)0, 0);
         
-        if (DCI_SUCCESS != DCIDateTimeCheck(P->usr, P->err, P->params[i].type.date, &valid) || valid != 0)
+        if (OCI_SUCCESS != OCIDateTimeCheck(P->usr, P->err, P->params[i].type.date, &valid) || valid != 0)
         {
                 THROW(SQLException, "Invalid date/time value");
         }
 
-        P->params[i].length = sizeof(DCIDateTime *);
+        P->params[i].length = sizeof(OCIDateTime *);
 
-        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.date, 
-                                    P->params[i].length, SQLT_TIMESTAMP, 0, 0, 0, 0, 0, DCI_DEFAULT);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.date, 
+                                    P->params[i].length, SQLT_TIMESTAMP, 0, 0, 0, 0, 0, OCI_DEFAULT);
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
@@ -229,9 +229,9 @@ static void _setInt(T P, int parameterIndex, int x) {
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
         P->params[i].type.integer = x;
         P->params[i].length = sizeof(x);
-        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.integer,
-                                    (int)P->params[i].length, SQLT_INT, 0, 0, 0, 0, 0, DCI_DEFAULT);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.integer,
+                                    (int)P->params[i].length, SQLT_INT, 0, 0, 0, 0, 0, OCI_DEFAULT);
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
@@ -240,12 +240,12 @@ static void _setInt(T P, int parameterIndex, int x) {
 //         assert(P);
 //         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
 //         P->params[i].length = sizeof(P->params[i].type.number);
-//         P->lastError = DCINumberFromInt(P->err, &x, sizeof(x), DCI_NUMBER_SIGNED, &P->params[i].type.number);
-//         if (P->lastError != DCI_SUCCESS)
+//         P->lastError = OCINumberFromInt(P->err, &x, sizeof(x), OCI_NUMBER_SIGNED, &P->params[i].type.number);
+//         if (P->lastError != OCI_SUCCESS)
 //                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-//         P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.number, 
-//                                     (int)P->params[i].length, SQLT_VNU, 0, 0, 0, 0, 0, DCI_DEFAULT);
-//         if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+//         P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.number, 
+//                                     (int)P->params[i].length, SQLT_VNU, 0, 0, 0, 0, 0, OCI_DEFAULT);
+//         if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
 //                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 // }
 
@@ -255,9 +255,9 @@ static void _setDouble(T P, int parameterIndex, double x) {
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
         P->params[i].type.real = x;
         P->params[i].length = sizeof(x);
-        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.real, 
-                                    (int)P->params[i].length, SQLT_FLT, 0, 0, 0, 0, 0, DCI_DEFAULT);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.real, 
+                                    (int)P->params[i].length, SQLT_FLT, 0, 0, 0, 0, 0, OCI_DEFAULT);
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
@@ -268,14 +268,14 @@ static void _setBlob(T P, int parameterIndex, const void *x, int size) {
         P->params[i].type.blob = x;
         if (x) {
                 P->params[i].length = size;
-                P->params[i].is_null = DCI_IND_NOTNULL;
+                P->params[i].is_null = OCI_IND_NOTNULL;
         } else {
                 P->params[i].length = size;
-                P->params[i].is_null = DCI_IND_NULL;
+                P->params[i].is_null = OCI_IND_NULL;
         }
-        P->lastError = DCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (void *)P->params[i].type.blob,
-                                    (int)P->params[i].length, SQLT_CLOB, NULL, NULL, NULL, NULL, NULL, DCI_DEFAULT);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (void *)P->params[i].type.blob,
+                                    (int)P->params[i].length, SQLT_CLOB, NULL, NULL, NULL, NULL, NULL, OCI_DEFAULT);
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
@@ -288,19 +288,19 @@ static void _execute(T P) {
                 P->running = true;
         }
      
-        P->lastError = DCIStmtExecute(P->svc, P->stmt, P->err, 1, 0, NULL, NULL, DCI_DEFAULT);
+        P->lastError = OCIStmtExecute(P->svc, P->stmt, P->err, 1, 0, NULL, NULL, OCI_DEFAULT);
     
         P->running = false;
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
         {
                 printf("exectue异常\n");
                 printf("execute中查看返回码:%d\n",P->lastError);
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
         }
                 
-        P->lastError = DCIAttrGet( P->stmt, DCI_HTYPE_STMT, &P->rowsChanged, 0, DCI_ATTR_ROW_COUNT, P->err);
+        P->lastError = OCIAttrGet( P->stmt, OCI_HTYPE_STMT, &P->rowsChanged, 0, OCI_ATTR_ROW_COUNT, P->err);
          // printf("execute中查看返回码:%d\n",P->lastError);
-        if (P->lastError != DCI_SUCCESS && P->lastError != DCI_SUCCESS_WITH_INFO)
+        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
         {
                  printf("exectue111异常\n");
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
@@ -316,9 +316,9 @@ static ResultSet_T _executeQuery(T P) {
                 P->countdown = P->timeout;
                 P->running = true;
         }
-        P->lastError = DCIStmtExecute(P->svc, P->stmt, P->err, 0, 0, NULL, NULL, DCI_DEFAULT);
+        P->lastError = OCIStmtExecute(P->svc, P->stmt, P->err, 0, 0, NULL, NULL, OCI_DEFAULT);
         P->running = false;
-        if (P->lastError == DCI_SUCCESS || P->lastError == DCI_SUCCESS_WITH_INFO)
+        if (P->lastError == OCI_SUCCESS || P->lastError == OCI_SUCCESS_WITH_INFO)
                 return ResultSet_new(OracleResultSet_new(P->delegator, P->stmt, P->env, P->usr, P->err, P->svc, false), (Rop_T)&oraclerops);
         THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
         return NULL;

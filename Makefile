@@ -348,14 +348,14 @@ CC = gcc
 CCDEPMODE = depmode=none
 CFLAGS = -Wno-address -Wno-pointer-sign -g -O2 -D_GNU_SOURCE -Wall -Wunused -Wno-unused-label -funsigned-char -std=c11
 CPP = gcc -E
-CPPFLAGS = -I/home/dyy/dci/include 
+CPPFLAGS = -I/home/dyy/dmoci/include 
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=none
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DBCPPFLAGS =  -I/home/dyy/dci/include
-DBLDFLAGS =  -L/usr/lib/x86_64-linux-gnu -ldmdci -lpthread -ldl -lssl -lcrypto -lresolv -lm -lrt
+DBCPPFLAGS =  -I/home/dyy/dmoci/include
+DBLDFLAGS =  -L/usr/lib/x86_64-linux-gnu -ldmoci -lpthread -ldl -lssl -lcrypto -lresolv -lm -lrt
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
 DLLTOOL = false
@@ -375,7 +375,7 @@ INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = /usr/bin/ld -m elf_x86_64
-LDFLAGS = -L/usr/lib/x86_64-linux-gnu -ldmdci -lpthread -ldl -lssl -lcrypto -lresolv -lm -lrt 
+LDFLAGS = -L/usr/lib/x86_64-linux-gnu -ldmoci -lpthread -ldl -lssl -lcrypto -lresolv -lm -lrt 
 LEX = flex
 LEXLIB = -lfl
 LEX_OUTPUT_ROOT = lex.yy
