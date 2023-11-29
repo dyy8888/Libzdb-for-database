@@ -101,38 +101,32 @@ static bool _initaleDefiningBuffers(T R) {
                 /* Use the retrieved length of dname to allocate an output buffer, and
                  then define the output variable. */
                 deptlen +=1;
-                // printf("查询deptlen:%d,查询dtype:%d\n",deptlen,dtype);
                 R->columns[i-1].length = deptlen;
                 R->columns[i-1].isNull = 0;
                 switch(dtype)
                 {
                         case SQLT_BLOB:
-                                // printf("查询blob");
                                 R->columns[i-1].buffer = NULL;
                                 status = OCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) OCI_DTYPE_LOB,
                                                             (size_t) 0, (dvoid **) 0);
                                 R->lastError = OCIDefineByPos(R->stmt, &R->columns[i-1].def, R->err, i,
                                                               &(R->columns[i-1].lob_loc), deptlen, SQLT_BLOB, &(R->columns[i-1].isNull), 0, 0, OCI_DEFAULT);
-                                // printf("查看buffer的值:%s\n",R->columns[i-1].buffer);
                                 break;
                                 
                         case SQLT_CLOB:
-                                // printf("查询clob");
                                 R->columns[i-1].buffer = NULL;
                                 status = OCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].lob_loc),
                                                             (ub4) OCI_DTYPE_LOB,
                                                             (size_t) 0, (dvoid **) 0);
                                 R->lastError = OCIDefineByPos(R->stmt, &R->columns[i-1].def, R->err, i,
                                                               &(R->columns[i-1].lob_loc), deptlen, SQLT_CLOB, &(R->columns[i-1].isNull), 0, 0, OCI_DEFAULT);
-                                // printf("查看buffer的值:%s\n",R->columns[i-1].buffer);
                                 break;
                         case SQLT_DAT:
                         case SQLT_DATE:
                         case SQLT_TIMESTAMP:
                         case SQLT_TIMESTAMP_TZ:
                         case SQLT_TIMESTAMP_LTZ:
-                                // printf("SQLT_TIMESTAMP_LTZ\n");
                                 R->columns[i-1].buffer = NULL;
                                 status = OCIDescriptorAlloc((dvoid *)R->env, (dvoid **) &(R->columns[i-1].date),
                                                             (ub4) OCI_DTYPE_TIMESTAMP,
@@ -141,12 +135,10 @@ static bool _initaleDefiningBuffers(T R) {
                                                               &(R->columns[i-1].date), sizeof(R->columns[i-1].date), SQLT_TIMESTAMP, &(R->columns[i-1].isNull), 0, 0, OCI_DEFAULT);
                                 break;
                         default:
-                                // printf("default\n");
                                 R->columns[i-1].lob_loc = NULL;
                                 R->columns[i-1].buffer = ALLOC(2*deptlen + 1);
                                 R->lastError = OCIDefineByPos(R->stmt, &R->columns[i-1].def, R->err, i,
                                                               R->columns[i-1].buffer, (2*deptlen+1), SQLT_STR, &(R->columns[i-1].isNull), 0, 0, OCI_DEFAULT);
-                                // printf("查看buffer的值:%s\n",R->columns[i-1].buffer);
                 }
                 {
                         char *col_name;
@@ -156,12 +148,10 @@ static bool _initaleDefiningBuffers(T R) {
                         R->lastError = OCIAttrGet(pard, OCI_DTYPE_PARAM, &col_name, &col_name_len, OCI_ATTR_NAME, R->err);
                         if (R->lastError != OCI_SUCCESS)
                                 continue;
-                        // printf("查看col_name：%s\n",col_name);
                         // column name could be non NULL terminated
                         // it is not allowed to do: col_name[col_name_len] = 0;
                         // so, copy the string
                         tmp_buffer = Str_ndup(col_name, col_name_len);
-                        // printf("查看buffer:%s\n",tmp_buffer);
 #if defined(ORACLE_COLUMN_NAME_LOWERCASE) && ORACLE_COLUMN_NAME_LOWERCASE > 1
                         R->columns[i-1].name = CALLOC(1, col_name_len+1);
                         OCIMultiByteStrCaseConversion(R->env, R->columns[i-1].name, tmp_buffer, OCI_NLS_LOWERCASE);
@@ -220,7 +210,6 @@ T OracleResultSet_new(Connection_T delegator, OCIStmt *stmt, OCIEnv *env, OCISes
         R->freeStatement = need_free;
         /* Get the number of columns in the select list */
         R->lastError = OCIAttrGet (R->stmt, OCI_HTYPE_STMT, &R->columnCount, NULL, OCI_ATTR_PARAM_COUNT, R->err);
-        // printf("%d\n",R->columnCount);
         if (R->lastError != OCI_SUCCESS && R->lastError != OCI_SUCCESS_WITH_INFO)
                 DEBUG("_new: Error %d, '%s'\n", R->lastError, OraclePreparedStatement_getLastError(R->lastError,R->err));
         R->columns = CALLOC(R->columnCount, sizeof (struct column_t));
@@ -295,7 +284,6 @@ static long _getColumnSize(T R, int columnIndex) {
 static void _setFetchSize(T R, int rows) {
         assert(R);
         assert(rows > 0);
-        // printf("_setFetchSize查看rows:%d",rows);
         R->lastError = OCIAttrSet(R->stmt, OCI_HTYPE_STMT, (void*)&rows, (ub4)sizeof(ub4), OCI_ATTR_PREFETCH_ROWS, R->err);
         if (R->lastError != OCI_SUCCESS)
                 DEBUG("OCIAttrSet -- %s\n", OraclePreparedStatement_getLastError(R->lastError, R->err));
@@ -310,34 +298,25 @@ static int _getFetchSize(T R) {
 
 
 static bool _next(T R) {
-        // printf("nextnext\n");
-        // printf("currentrow:%d\n",R->currentRow);
         assert(R);
         if ((R->currentRow < 0) || ((R->maxRows > 0) && (R->currentRow >= R->maxRows)))
         {
-                // printf("1\n");
                 return false;
         }       
         R->lastError = OCIStmtFetch(R->stmt, R->err, 1, OCI_FETCH_NEXT, OCI_DEFAULT);
         if (R->lastError == OCI_NO_DATA)
         {
-                
-                // printf("2\n");
                 return false;
         }
-        // printf("lastError:%d\n",R->lastError);   
         if (R->lastError != OCI_SUCCESS && R->lastError != OCI_SUCCESS_WITH_INFO)
         {
-                // printf("3\n");
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(R->lastError, R->err));
         }       
         if (R->lastError == OCI_SUCCESS_WITH_INFO)
         {
-                // printf("4\n");
                 DEBUG("_next Error %d, '%s'\n", R->lastError, OraclePreparedStatement_getLastError(R->lastError, R->err));
         } 
         R->currentRow++;
-        // printf("5\n");
         return ((R->lastError == OCI_SUCCESS) || (R->lastError == OCI_SUCCESS_WITH_INFO));
 }
 
@@ -361,15 +340,12 @@ static const char *_getString(T R, int columnIndex) {
         }
         if (R->columns[i].buffer)
                 R->columns[i].buffer[R->columns[i].length] = 0;
-        printf("查看得到的string值:%s\n",R->columns[i].buffer);
         return R->columns[i].buffer;
 }
 
 
 static const void *_getBlob(T R, int columnIndex, int *size) {
         assert(R);
-        // printf("使用getblob方法\n");
-        // printf("==========%d查看索引值\n",columnIndex);
         int i = checkAndSetColumnIndex(columnIndex, R->columnCount);
         if (R->columns[i].isNull)
                 return NULL;
@@ -401,7 +377,6 @@ static const void *_getBlob(T R, int columnIndex, int *size) {
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(R->lastError, R->err));
         }
         *size = R->columns[i].length = (int)total_bytes;
-        printf("-------------------%d,%d\n",R->columns[i].length,R->columns[i].name);
         return (const void *)R->columns[i].buffer;
 }
 

@@ -125,7 +125,6 @@ static bool _doConnect(T C, char**  error) {
         if (! (servicename = URL_getPath(url)))
                 ERROR("no Service Name specified in URL");
         ++servicename;
-        // printf("servicename:%s,username:%s,password:%s\n",servicename,username,password);
         /* Create a thread-safe OCI environment with N' substitution turned on. */
         if (OCIEnvCreate(&C->env, OCI_THREADED | OCI_OBJECT | OCI_NCHAR_LITERAL_REPLACE_ON, 0, 0, 0, 0, 0, 0))
         {
@@ -198,7 +197,6 @@ static bool _doConnect(T C, char**  error) {
         if (IS(URL_getParameter(url, "SYSDBA"), "true")) {
                 sessionFlags |= OCI_SYSDBA;
         }
-        // printf("%d\n",sessionFlags);
         C->lastError = OCISessionBegin(C->svc, C->err, C->usr, OCI_CRED_RDBMS, sessionFlags);
         if (C->lastError != OCI_SUCCESS && C->lastError != OCI_SUCCESS_WITH_INFO)
         {

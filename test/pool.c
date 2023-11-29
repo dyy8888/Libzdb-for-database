@@ -54,7 +54,6 @@ static void testPool(const char *testURL) {
         } else if (Str_startsWith(testURL, "sqlite")) {
                 schema = SCHEMA_SQLITE;
         } else if (Str_startsWith(testURL, "oracle")) {
-                printf("选定oracle");
                 schema = SCHEMA_ORACLE;
         }
         else {

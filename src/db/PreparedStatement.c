@@ -54,7 +54,6 @@ struct PreparedStatement_S {
 
 static void _clearResultSet(T P) {
         if (P->resultSet){
-        printf("执行清除\n");
          ResultSet_free(&P->resultSet);
         }
         	
@@ -89,7 +88,6 @@ void PreparedStatement_free(T *P) {
 
 void PreparedStatement_setString(T P, int parameterIndex, const char *x) {
 	assert(P);
-	printf("查看x的值:%s\n",x);
         P->op->setString(P->D, parameterIndex, x);
 }
 
