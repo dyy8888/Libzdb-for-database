@@ -53,11 +53,8 @@ struct PreparedStatement_S {
 
 
 static void _clearResultSet(T P) {
-        if (P->resultSet){
-         ResultSet_free(&P->resultSet);
-        }
-        	
-               
+        if (P->resultSet)
+                ResultSet_free(&P->resultSet);
 }
 
 
@@ -98,9 +95,9 @@ void PreparedStatement_setInt(T P, int parameterIndex, int x) {
 }
 
 
-void PreparedStatement_setLLong(T P, int parameterIndex, const char *x,int size) {
+void PreparedStatement_setLLong(T P, int parameterIndex, long long x) {
 	assert(P);
-        P->op->setLLong(P->D, parameterIndex, x,size);
+        P->op->setLLong(P->D, parameterIndex, x);
 }
 
 

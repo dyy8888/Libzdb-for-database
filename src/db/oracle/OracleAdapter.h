@@ -25,7 +25,8 @@
 #ifndef ORACLEADAPTER_INCLUDED
 #define ORACLEADAPTER_INCLUDED
 
-#include "DCI.h"
+#include <dci.h>
+
 #include "zdb.h"
 #include "system/Time.h"
 
@@ -35,7 +36,6 @@ static void *FUNCNAME(void *args) {       \
     while (S->svc) {                      \
         if (S->running) {                 \
             if (S->countdown <= 0) {      \
-                OCIBreak(S->svc, S->err); \
                 S->running = false;       \
             } else {                      \
                 S->countdown -= 10;       \
@@ -46,9 +46,9 @@ static void *FUNCNAME(void *args) {       \
     return NULL;                          \
 }
 
-const char *OraclePreparedStatement_getLastError(int err, OCIError *errhp) __attribute__ ((visibility("hidden")));
+const char *OraclePreparedStatement_getLastError(int err, DCIError *errhp) __attribute__ ((visibility("hidden")));
 
-ResultSetDelegate_T OracleResultSet_new(Connection_T delegator, OCIStmt *stmt, OCIEnv *env, OCISession* usr, OCIError *err, OCISvcCtx *svc, int need_free) __attribute__ ((visibility("hidden")));
-PreparedStatementDelegate_T OraclePreparedStatement_new(Connection_T delegator, OCIStmt *stmt, OCIEnv *env, OCISession* usr, OCIError *err, OCISvcCtx *svc) __attribute__ ((visibility("hidden")));
+ResultSetDelegate_T OracleResultSet_new(Connection_T delegator, DCIStmt *stmt, DCIEnv *env, DCISession* usr, DCIError *err, DCISvcCtx *svc, int need_free) __attribute__ ((visibility("hidden")));
+PreparedStatementDelegate_T OraclePreparedStatement_new(Connection_T delegator, DCIStmt *stmt, DCIEnv *env, DCISession* usr, DCIError *err, DCISvcCtx *svc) __attribute__ ((visibility("hidden")));
 
 #endif

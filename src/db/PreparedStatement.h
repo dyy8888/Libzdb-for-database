@@ -184,7 +184,7 @@ void PreparedStatement_setInt(T P, int parameterIndex, int x);
  * index is out of range
  * @see SQLException.h
  */
-void PreparedStatement_setLLong(T P, int parameterIndex,const char *x,int size);
+void PreparedStatement_setLLong(T P, int parameterIndex, long long x);
 
 
 /**

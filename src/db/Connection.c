@@ -50,7 +50,7 @@
 
 
 #ifdef HAVE_LIBMYSQLCLIENT
-extern const struct Cop_T oraclesqlcops;
+extern const struct Cop_T mysqlcops;
 #endif
 #ifdef HAVE_LIBPQ
 extern const struct Cop_T postgresqlcops;
@@ -64,8 +64,7 @@ extern const struct Cop_T oraclesqlcops;
 
 static const struct Cop_T *cops[] = {
 #ifdef HAVE_LIBMYSQLCLIENT
-        // &mysqlcops,
-        &oraclesqlcops,
+        &mysqlcops,
 #endif
 #ifdef HAVE_LIBPQ
         &postgresqlcops,
@@ -164,7 +163,7 @@ void Connection_setAvailable(T C, bool isAvailable) {
         assert(C);
         C->isAvailable = isAvailable;
         C->lastAccessedTime = Time_now();
-};
+}
 
 
 bool Connection_isAvailable(T C) {

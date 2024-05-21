@@ -78,32 +78,19 @@ static void testStr() {
         
         printf("=> Test5: startsWith\n");
         {
-                char *a = "oracle://101.201.81.164:5236/?user=SYSDBA&password=Dameng111";
-                printf("\tResult: starts with oracle - %s\n", 
-                       Str_startsWith(a, "oracle")?"yes":"no");
-                assert(Str_startsWith(a, "oracle"));
+                char *a = "mysql://localhost:3306/zild?user=root&password=swordfish";
+                printf("\tResult: starts with mysql - %s\n", 
+                       Str_startsWith(a, "mysql")?"yes":"no");
+                assert(Str_startsWith(a, "mysql"));
                 assert(! Str_startsWith(a, "sqlite"));
                 assert(Str_startsWith("sqlite", "sqlite"));
                 printf("\tTesting for NULL and NUL argument\n");
                 assert(! Str_startsWith(a, NULL));
                 assert(! Str_startsWith(a, ""));
-                assert(! Str_startsWith(NULL, "oracle"));
+                assert(! Str_startsWith(NULL, "mysql"));
                 assert(! Str_startsWith("", NULL));
                 assert(! Str_startsWith(NULL, NULL));
                 assert(Str_startsWith("", ""));
-                // char *a = "mysql://localhost:3306/zild?user=root&password=swordfish";
-                // printf("\tResult: starts with mysql - %s\n", 
-                //        Str_startsWith(a, "mysql")?"yes":"no");
-                // assert(Str_startsWith(a, "mysql"));
-                // assert(! Str_startsWith(a, "sqlite"));
-                // assert(Str_startsWith("sqlite", "sqlite"));
-                // printf("\tTesting for NULL and NUL argument\n");
-                // assert(! Str_startsWith(a, NULL));
-                // assert(! Str_startsWith(a, ""));
-                // assert(! Str_startsWith(NULL, "mysql"));
-                // assert(! Str_startsWith("", NULL));
-                // assert(! Str_startsWith(NULL, NULL));
-                // assert(Str_startsWith("", ""));
         }
         printf("=> Test5: OK\n\n");
         

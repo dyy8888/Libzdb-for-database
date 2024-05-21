@@ -23,7 +23,7 @@
 /* #undef HAVE_LIBCRYPTO */
 
 /* Define to 1 to enable mysql */
-#define HAVE_LIBMYSQLCLIENT 1
+#define HAVE_ORACLE 1
 
 /* Define to 1 to enable postgresql */
 /* #undef HAVE_LIBPQ */
@@ -38,7 +38,7 @@
 /* #undef HAVE_LIBSSL */
 
 /* Define to 1 if you have the <mysql.h> header file. */
-#define HAVE_ORACLE 1
+// #define HAVE_MYSQL_H 1
 
 /* Define to 1 to enable oracle */
 /* #undef HAVE_ORACLE */
@@ -62,7 +62,7 @@
 #define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
-/* #undef HAVE_STDIO_H */
+#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
