@@ -5,7 +5,7 @@
  * Copyright (C) Tildeslash Ltd. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and assOCIated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -53,23 +53,23 @@ typedef struct param_t {
                 long integer;
                 const void *blob;
                 const char *string;
-                OCINumber number;
-                OCIDateTime* date;
+                GCINumber number;
+                GCIDateTime* date;
         } type;
-        OCIInd is_null;
+        bool is_null;
         int length;
-        OCIBind* bind;
+        GCIBind* bind;
 } *param_t;
 #define T PreparedStatementDelegate_T
 struct T {
         int         timeout;
         int         countdown;
         ub4         parameterCount;
-        OCISession* usr;
-        OCIStmt*    stmt;
-        OCIEnv*     env;
-        OCIError*   err;
-        OCISvcCtx*  svc;
+        GCISession* usr;
+        GCIStmt*    stmt;
+        GCIEnv*     env;
+        GCIError*   err;
+        GCISvcCtx*  svc;
         param_t     params;
         sword       lastError;
         Thread_T    watchdog;
@@ -89,7 +89,7 @@ WATCHDOG(watchdog, T)
 /* ------------------------------------------------------------- Constructor */
 
 
-T OraclePreparedStatement_new(Connection_T delegator, OCIStmt *stmt, OCIEnv *env, OCISession* usr, OCIError *err, OCISvcCtx *svc) {
+T OraclePreparedStatement_new(Connection_T delegator, GCIStmt *stmt, GCIEnv *env, GCISession* usr, GCIError *err, GCISvcCtx *svc, int n) {
         T P;
         assert(stmt);
         assert(env);
@@ -103,12 +103,13 @@ T OraclePreparedStatement_new(Connection_T delegator, OCIStmt *stmt, OCIEnv *env
         P->svc  = svc;
         P->usr  = usr; 
         P->timeout = Connection_getQueryTimeout(P->delegator);
-        P->lastError = OCI_SUCCESS;
+        P->lastError = GCI_SUCCESS;
         P->rowsChanged = 0;
+        P->parameterCount = n;
         /* parameterCount */
-        P->lastError = OCIAttrGet(P->stmt, OCI_HTYPE_STMT, &P->parameterCount, NULL, OCI_ATTR_BIND_COUNT, P->err);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
-                P->parameterCount = 0;
+        // P->lastError = GCIAttrGet(P->stmt, GCI_HTYPE_STMT, &P->parameterCount, NULL, GCI_ATTR_BIND_COUNT, P->err);
+        // if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
+        //         P->parameterCount = 0;
         if (P->parameterCount)
                 P->params = CALLOC(P->parameterCount, sizeof(struct param_t));
         P->running = false;
@@ -124,7 +125,7 @@ T OraclePreparedStatement_new(Connection_T delegator, OCIStmt *stmt, OCIEnv *env
 
 static void _free(T *P) {
         assert(P && *P);
-        OCIHandleFree((*P)->stmt, OCI_HTYPE_STMT);
+        GCIHandleFree((*P)->stmt, GCI_HTYPE_STMT);
         if ((*P)->params) {
                 // (*P)->params[i].bind is freed implicitly when the statement handle is deallocated
                 FREE((*P)->params);
@@ -142,69 +143,48 @@ static void _setString(T P, int parameterIndex, const char *x) {
         P->params[i].type.string = x;
         if (x) {
                 P->params[i].length = (int)strlen(x);
-                P->params[i].is_null = OCI_IND_NOTNULL;
+                // P->params[i].is_null = GCI_IND_NOTNULL;
         } else {
                 P->params[i].length = 0;
-                P->params[i].is_null = OCI_IND_NULL;
+                // P->params[i].is_null = GCI_IND_NULL;
         }
-        
-        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
-                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, OCI_DEFAULT);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
-        {      
+        P->lastError = GCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
+                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, GCI_DEFAULT);
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-        }
 }
 
-static void _setLLong(T P, int parameterIndex, const char *x,int size) {
-        assert(P);
-        int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
-        P->params[i].type.string = x;
-        if (x) {
-                P->params[i].length = (int)strlen(x);
-                P->params[i].is_null = OCI_IND_NOTNULL;
-        } else {
-                P->params[i].length = 0;
-                P->params[i].is_null = OCI_IND_NULL;
-        }
-        
-        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (char *)P->params[i].type.string,
-                                    (int)P->params[i].length, SQLT_CHR, &P->params[i].is_null, 0, 0, 0, 0, OCI_DEFAULT);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
-        {    
-                THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-        }
-}
+
 static void _setTimestamp(T P, int parameterIndex, time_t time) {
         assert(P);
         struct tm ts = {.tm_isdst = -1};
         ub4   valid;
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
 
-        P->lastError = OCIDescriptorAlloc((dvoid *)P->env, (dvoid **) &(P->params[i].type.date),
-                                          (ub4) OCI_DTYPE_TIMESTAMP,
+        P->lastError = GCIDescriptorAlloc((dvoid *)P->env, (dvoid **) &(P->params[i].type.date),
+                                          (ub4) GCI_DTYPE_TIMESTAMP,
                                           (size_t) 0, (dvoid **) 0);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 
         gmtime_r(&time, &ts);
 
-        OCIDateTimeConstruct(P->usr,
+        GCIDateTimeConstruct(P->usr,
                              P->err,
-                             P->params[i].type.date, //OCIDateTime   *datetime,
+                             P->params[i].type.date, //GCIDateTime   *datetime,
                              ts.tm_year+1900, ts.tm_mon+1, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec, 0/*fsec*/,
-                             (dmtext*)0, 0);
+                             (OraText*)0, 0);
         
-        if (OCI_SUCCESS != OCIDateTimeCheck(P->usr, P->err, P->params[i].type.date, &valid) || valid != 0)
+        if (GCI_SUCCESS != GCIDateTimeCheck(P->usr, P->err, P->params[i].type.date, &valid) || valid != 0)
         {
                 THROW(SQLException, "Invalid date/time value");
         }
 
-        P->params[i].length = sizeof(OCIDateTime *);
+        P->params[i].length = sizeof(GCIDateTime *);
 
-        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.date, 
-                                    P->params[i].length, SQLT_TIMESTAMP, 0, 0, 0, 0, 0, OCI_DEFAULT);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
+        P->lastError = GCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.date, 
+                                    P->params[i].length, SQLT_TIMESTAMP, 0, 0, 0, 0, 0, GCI_DEFAULT);
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
@@ -214,25 +194,25 @@ static void _setInt(T P, int parameterIndex, int x) {
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
         P->params[i].type.integer = x;
         P->params[i].length = sizeof(x);
-        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.integer,
-                                    (int)P->params[i].length, SQLT_INT, 0, 0, 0, 0, 0, OCI_DEFAULT);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
+        P->lastError = GCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.integer,
+                                    (int)P->params[i].length, SQLT_INT, 0, 0, 0, 0, 0, GCI_DEFAULT);
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
 
-// static void _setLLong(T P, int parameterIndex, long long x) {
-//         assert(P);
-//         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
-//         P->params[i].length = sizeof(P->params[i].type.number);
-//         P->lastError = OCINumberFromInt(P->err, &x, sizeof(x), OCI_NUMBER_SIGNED, &P->params[i].type.number);
-//         if (P->lastError != OCI_SUCCESS)
-//                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-//         P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.number, 
-//                                     (int)P->params[i].length, SQLT_VNU, 0, 0, 0, 0, 0, OCI_DEFAULT);
-//         if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
-//                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-// }
+static void _setLLong(T P, int parameterIndex, long long x) {
+        assert(P);
+        int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
+        P->params[i].length = sizeof(P->params[i].type.number);
+        P->lastError = GCINumberFromInt(P->err, &x, sizeof(x), GCI_NUMBER_SIGNED, &P->params[i].type.number);
+        if (P->lastError != GCI_SUCCESS)
+                THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+        P->lastError = GCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.number, 
+                                    (int)P->params[i].length, SQLT_VNU, 0, 0, 0, 0, 0, GCI_DEFAULT);
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
+                THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
+}
 
 
 static void _setDouble(T P, int parameterIndex, double x) {
@@ -240,27 +220,29 @@ static void _setDouble(T P, int parameterIndex, double x) {
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
         P->params[i].type.real = x;
         P->params[i].length = sizeof(x);
-        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.real, 
-                                    (int)P->params[i].length, SQLT_FLT, 0, 0, 0, 0, 0, OCI_DEFAULT);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
+        P->lastError = GCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, &P->params[i].type.real, 
+                                    (int)P->params[i].length, SQLT_FLT, 0, 0, 0, 0, 0, GCI_DEFAULT);
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
 
 static void _setBlob(T P, int parameterIndex, const void *x, int size) {
+        
         assert(P);
+        
         int i = checkAndSetParameterIndex(parameterIndex, P->parameterCount);
         P->params[i].type.blob = x;
         if (x) {
                 P->params[i].length = size;
-                P->params[i].is_null = OCI_IND_NOTNULL;
+                // P->params[i].is_null = GCI_IND_NOTNULL;
         } else {
                 P->params[i].length = size;
-                P->params[i].is_null = OCI_IND_NULL;
+                // P->params[i].is_null = GCI_IND_NULL;
         }
-        P->lastError = OCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (void *)P->params[i].type.blob,
-                                    (int)P->params[i].length, SQLT_CLOB, NULL, NULL, NULL, NULL, NULL, OCI_DEFAULT);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
+        P->lastError = GCIBindByPos(P->stmt, &P->params[i].bind, P->err, parameterIndex, (void *)P->params[i].type.blob,
+                                    (int)P->params[i].length, SQLT_LNG, &P->params[i].is_null, 0, 0, 0, 0, GCI_DEFAULT);
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
 }
 
@@ -272,21 +254,13 @@ static void _execute(T P) {
                 P->countdown = P->timeout;
                 P->running = true;
         }
-     
-        P->lastError = OCIStmtExecute(P->svc, P->stmt, P->err, 1, 0, NULL, NULL, OCI_DEFAULT);
-    
+        P->lastError = GCIStmtExecute(P->svc, P->stmt, P->err, 1, 0, NULL, NULL, GCI_DEFAULT);
         P->running = false;
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
-        {
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-        }
-                
-        P->lastError = OCIAttrGet( P->stmt, OCI_HTYPE_STMT, &P->rowsChanged, 0, OCI_ATTR_ROW_COUNT, P->err);
-        if (P->lastError != OCI_SUCCESS && P->lastError != OCI_SUCCESS_WITH_INFO)
-        {
+        P->lastError = GCIAttrGet( P->stmt, GCI_HTYPE_STMT, &P->rowsChanged, 0, GCI_ATTR_ROW_COUNT, P->err);
+        if (P->lastError != GCI_SUCCESS && P->lastError != GCI_SUCCESS_WITH_INFO)
                 THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
-        }
-                
 }
 
 
@@ -297,9 +271,9 @@ static ResultSet_T _executeQuery(T P) {
                 P->countdown = P->timeout;
                 P->running = true;
         }
-        P->lastError = OCIStmtExecute(P->svc, P->stmt, P->err, 0, 0, NULL, NULL, OCI_DEFAULT);
+        P->lastError = GCIStmtExecute(P->svc, P->stmt, P->err, 0, 0, NULL, NULL, GCI_DEFAULT);
         P->running = false;
-        if (P->lastError == OCI_SUCCESS || P->lastError == OCI_SUCCESS_WITH_INFO)
+        if (P->lastError == GCI_SUCCESS || P->lastError == GCI_SUCCESS_WITH_INFO)
                 return ResultSet_new(OracleResultSet_new(P->delegator, P->stmt, P->env, P->usr, P->err, P->svc, false), (Rop_T)&oraclerops);
         THROW(SQLException, "%s", OraclePreparedStatement_getLastError(P->lastError, P->err));
         return NULL;

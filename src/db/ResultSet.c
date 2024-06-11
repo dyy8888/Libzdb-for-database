@@ -140,6 +140,10 @@ const char *ResultSet_getString(T R, int columnIndex) {
 	return R->op->getString(R->D, columnIndex);
 }
 
+long ResultSet_getInt(T R, int columnIndex) {
+	assert(R);
+	return R->op->getInt(R->D, columnIndex);
+}
 
 const char *ResultSet_getStringByName(T R, const char *columnName) {
 	assert(R);
@@ -147,14 +151,14 @@ const char *ResultSet_getStringByName(T R, const char *columnName) {
 }
 
 
-int ResultSet_getInt(T R, int columnIndex) {
-	assert(R);
-        const char *s = R->op->getString(R->D, columnIndex);
-	return s ? Str_parseInt(s) : 0;
-}
+// int ResultSet_getInt(T R, int columnIndex) {
+// 	assert(R);
+//         const char *s = R->op->getString(R->D, columnIndex);
+// 	return s ? Str_parseInt(s) : 0;
+// }
 
 
-int ResultSet_getIntByName(T R, const char *columnName) {
+long ResultSet_getIntByName(T R, const char *columnName) {
 	assert(R);
 	return ResultSet_getInt(R, _getIndex(R, columnName));
 }

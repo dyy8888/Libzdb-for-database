@@ -24,7 +24,7 @@ const std::map<std::string, std::string> schema {
         { "mysql", "CREATE TABLE zild_t(id INTEGER AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), percent REAL, image BLOB);"},
         { "postgresql", "CREATE TABLE zild_t(id SERIAL PRIMARY KEY, name VARCHAR(255), percent REAL, image BYTEA);"},
         { "sqlite", "CREATE TABLE zild_t(id INTEGER PRIMARY KEY, name VARCHAR(255), percent REAL, image BLOB);"},
-        { "oracle", "CREATE TABLE zild_t(id int IDENTITY(1,1) , name VARCHAR(255), percents REAL, images CLOB);"}
+        { "oracle", "CREATE TABLE zild_t(id NUMBER GENERATED AS IDENTITY, name VARCHAR(255), percent REAL, image CLOB);"}
 };
 
 static void testCreateSchema(ConnectionPool& pool) {
@@ -34,14 +34,14 @@ static void testCreateSchema(ConnectionPool& pool) {
 }
 
 static void testPrepared(ConnectionPool& pool) {
-        double percents = 0.12;
+        double percent = 0.12;
         Connection con = pool.getConnection();
-        PreparedStatement p1 = con.prepareStatement("insert into zild_t (name, percents, images) values(?, ?, ?);");
+        PreparedStatement p1 = con.prepareStatement("insert into zild_t (name, percent, image) values(?, ?, ?);");
         con.beginTransaction();
         for (const auto &[name, image] : data) {
-                percents += 1 + percents;
+                percent += 1 + percent;
                 p1.bind(1, name);
-                p1.bind(2, percents);
+                p1.bind(2, percent);
                 p1.bind(3, std::tuple{image.c_str(), int(image.length() + 1)}); // include terminating \0
                 p1.execute();
         }
@@ -49,22 +49,22 @@ static void testPrepared(ConnectionPool& pool) {
         // takes parameters are automatically translated into a prepared statement.
         // Here we also demonstrate how to set a SQL null value by using nullptr which
         // must be used instead of NULL
-        con.execute("update zild_t set images = ? where id = ?", nullptr, 11);
+        con.execute("update zild_t set image = ? where id = ?", nullptr, 11);
         con.commit();
 }
 
 static void testQuery(ConnectionPool& pool) {
         Connection con = pool.getConnection();
         // Implicit prepared statement because of parameters
-        ResultSet result = con.executeQuery("select id, name, percents, images from zild_t where id < ? order by id;", 100);
+        ResultSet result = con.executeQuery("select id, name, percent, image from zild_t where id < ? order by id;", 100);
         result.setFetchSize(10); // Optionally set prefetched rows. Default is 100
         assert(result.columnCount() == 4);
         assert(std::string(result.columnName(1)) == "id");
         while (result.next()) {
                 int id = result.getInt(1);
                 const char *name = result.getString("name");
-                double percent = result.getDouble("percents");
-                auto [image, size] = result.getBlob("images");
+                double percent = result.getDouble("percent");
+                auto [image, size] = result.getBlob("image");
                 printf("\t%-5d%-20s%-10.2f%-16.38s\n", id, name ? name : "null", percent, size ? (char *)image : "null");
                 // Assert that SQL null above was set
                 if (id == 11) {

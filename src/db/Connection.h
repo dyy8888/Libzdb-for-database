@@ -342,6 +342,9 @@ ResultSet_T Connection_executeQuery(T C, const char *sql, ...) __attribute__((fo
  * @see SQLException.h
  */
 PreparedStatement_T Connection_prepareStatement(T C, const char *sql, ...) __attribute__((format (printf, 2, 3)));
+PreparedStatement_T Connection_prepareStatementClob(T C, const char *sql, ...) __attribute__((format (printf, 2, 3)));
+
+void Connection_readClob(T C, const char *sql, ...) ;
 
 
 /**

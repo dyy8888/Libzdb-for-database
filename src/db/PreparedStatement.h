@@ -184,7 +184,7 @@ void PreparedStatement_setInt(T P, int parameterIndex, int x);
  * index is out of range
  * @see SQLException.h
  */
-void PreparedStatement_setLLong(T P, int parameterIndex,const char *x,int size);
+void PreparedStatement_setLLong(T P, int parameterIndex, long long x);
 
 
 /**
@@ -213,6 +213,7 @@ void PreparedStatement_setDouble(T P, int parameterIndex, double x);
  */
 void PreparedStatement_setBlob(T P, int parameterIndex, const void *x, int size);
 
+// void PreparedStatement_setClob(T P, int parameterIndex, const void *x, int size);
 
 /**
  * Sets the <i>in</i> parameter at index <code>parameterIndex</code> to the
@@ -244,7 +245,7 @@ void PreparedStatement_setTimestamp(T P, int parameterIndex, time_t x);
  */
 void PreparedStatement_execute(T P);
 
-
+// void PreparedStatement_executelob(T P,const char *sql);
 /**
  * Executes the prepared SQL statement, which returns a single ResultSet
  * object. A ResultSet "lives" only until the next call to a PreparedStatement 

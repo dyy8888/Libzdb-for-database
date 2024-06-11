@@ -277,7 +277,7 @@ const char *ResultSet_getStringByName(T R, const char *columnName);
  * is outside the valid range or if the value is NaN
  * @see SQLException.h
  */
-int ResultSet_getInt(T R, int columnIndex);
+// int ResultSet_getInt(T R, int columnIndex);
 
 
 /**
@@ -298,7 +298,7 @@ int ResultSet_getInt(T R, int columnIndex);
  * does not exist or if the value is NaN
  * @see SQLException.h
  */
-int ResultSet_getIntByName(T R, const char *columnName);
+long ResultSet_getIntByName(T R, const char *columnName);
 
 
 /**
@@ -343,7 +343,7 @@ long long ResultSet_getLLong(T R, int columnIndex);
  */
 long long ResultSet_getLLongByName(T R, const char *columnName);
 
-
+long ResultSet_getInt(T R, int columnIndex);
 /**
  * Retrieves the value of the designated column in the current row of
  * this ResultSet object as a double. If <code>columnIndex</code>

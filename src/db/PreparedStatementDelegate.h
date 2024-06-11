@@ -41,14 +41,16 @@ typedef struct Pop_T {
         void (*free)(T *P);
         void (*setString)(T P, int parameterIndex, const char *x);
         void (*setInt)(T P, int parameterIndex, int x);
-        void (*setLLong)(T P, int parameterIndex, const char *x,int size);
+        void (*setLLong)(T P, int parameterIndex, long long x);
         void (*setDouble)(T P, int parameterIndex, double x);
         void (*setTimestamp)(T P, int parameterIndex, time_t timestamp);
         void (*setBlob)(T P, int parameterIndex, const void *x, int size);
+        // void (*setClob)(T P, int parameterIndex, const void *x, int size);
         void (*execute)(T P);
         ResultSet_T (*executeQuery)(T P);
         long long (*rowsChanged)(T P);
         int (*parameterCount)(T P);
+        // void (*executeLob)(T P,const char *sql);
 } *Pop_T;
 
 /**

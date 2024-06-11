@@ -52,7 +52,10 @@ typedef struct Cop_T {
         bool (*execute)(T C, const char *sql, va_list ap);
         ResultSet_T (*executeQuery)(T C, const char *sql, va_list ap);
         PreparedStatement_T (*prepareStatement)(T C, const char *sql, va_list ap);
+        // PreparedStatement_T (*prepareStatementClob)(T C, const char *sql, va_list ap);
         const char *(*getLastError)(T C);
+        // void (*readClob)(T C, const char *sql, va_list ap);
+
 } *Cop_T;
 
 #undef T

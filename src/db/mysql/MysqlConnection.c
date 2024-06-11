@@ -86,6 +86,7 @@ static MYSQL *_doConnect(Connection_T delegator, char **error) {
         } else if (! host)
                 ERROR("no host specified in URL");
         int port = URL_getPort(url);
+       
         if (port <= 0)
                 ERROR("no port specified in URL");
         const char *database = URL_getPath(url);
@@ -129,6 +130,7 @@ static MYSQL *_doConnect(Connection_T delegator, char **error) {
                 Connection_setFetchSize(delegator, rows);
         }
         // Connect
+        printf("port is %d\n",port);
         if (mysql_real_connect(db, host, user, password, database, port, unix_socket, clientFlags))
                 return db;
         *error = Str_dup(mysql_error(db));

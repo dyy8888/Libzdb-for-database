@@ -63,7 +63,7 @@ static void error_msg_key_alloc() {
 
 
 /* This is a general error function also used in OracleResultSet */
-const char *OraclePreparedStatement_getLastError(int err, OCIError *errhp) {
+const char *OraclePreparedStatement_getLastError(int err, GCIError *errhp) {
         sb4 errcode;
         Thread_once(error_msg_key_once, error_msg_key_alloc);
         char* erb = get_err_buffer();
@@ -71,29 +71,29 @@ const char *OraclePreparedStatement_getLastError(int err, OCIError *errhp) {
         assert(errhp);
         switch (err)
         {
-                case OCI_SUCCESS:
+                case GCI_SUCCESS:
                         return "";
-                case OCI_SUCCESS_WITH_INFO:
-                        return "Info - OCI_SUCCESS_WITH_INFO";
+                case GCI_SUCCESS_WITH_INFO:
+                        return "Info - GCI_SUCCESS_WITH_INFO";
                         break;
-                case OCI_NEED_DATA:
-                        return "Error - OCI_NEED_DATA";
+                case GCI_NEED_DATA:
+                        return "Error - GCI_NEED_DATA";
                         break;
-                case OCI_NO_DATA:
-                        return "Error - OCI_NODATA";
+                case GCI_NO_DATA:
+                        return "Error - GCI_NODATA";
                         break;
-                case OCI_ERROR:
-                        OCIErrorGet(errhp, 1, NULL, &errcode, erb, STRLEN, OCI_HTYPE_ERROR);
+                case GCI_ERROR:
+                        GCIErrorGet(errhp, 1, NULL, &errcode, erb, STRLEN, GCI_HTYPE_ERROR);
                         return erb;
                         break;
-                case OCI_INVALID_HANDLE:
-                        return "Error - OCI_INVALID_HANDLE";
+                case GCI_INVALID_HANDLE:
+                        return "Error - GCI_INVALID_HANDLE";
                         break;
-                case OCI_STILL_EXECUTING:
-                        return "Error - OCI_STILL_EXECUTE";
+                case GCI_STILL_EXECUTING:
+                        return "Error - GCI_STILL_EXECUTE";
                         break;
-                case OCI_CONTINUE:
-                        return "Error - OCI_CONTINUE";
+                case GCI_CONTINUE:
+                        return "Error - GCI_CONTINUE";
                         break;
                 default:
                         break;

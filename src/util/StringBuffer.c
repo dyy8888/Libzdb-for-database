@@ -73,6 +73,8 @@ static inline void _append(T S, const char *s, va_list ap) {
 static int _prepare(T S, char prefix) {
         int n, i;
         for (n = i = 0; S->buffer[i]; i++) if (S->buffer[i] == '?') n++;
+        return n;
+
         if (n > 99)
                 THROW(SQLException, "Max 99 parameters are allowed in a prepared statement. Found %d parameters in statement", n);
         else if (n) {

@@ -25,7 +25,7 @@
 #define SCHEMA_MYSQL      "CREATE TABLE zild_t(id INTEGER AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), percent REAL, image BLOB);"
 #define SCHEMA_POSTGRESQL "CREATE TABLE zild_t(id SERIAL PRIMARY KEY, name VARCHAR(255), percent REAL, image BYTEA);"
 #define SCHEMA_SQLITE     "CREATE TABLE zild_t(id INTEGER PRIMARY KEY, name VARCHAR(255), percent REAL, image BLOB);"
-#define SCHEMA_ORACLE     "CREATE TABLE zild_t(id int IDENTITY(1,1) , name VARCHAR(255), percents REAL, images BLOB);"
+#define SCHEMA_ORACLE     "CREATE TABLE zild_t(id NUMBER GENERATED AS IDENTITY, name VARCHAR(255), percent REAL, image CLOB);"
 
 #if HAVE_STRUCT_TM_TM_GMTOFF
 #define TM_GMTOFF tm_gmtoff
@@ -139,7 +139,7 @@ static void testPool(const char *testURL) {
                 Connection_beginTransaction(con);
                 /* Insert values into database and assume that auto increment of id works */
                 for (i = 0; data[i]; i++) 
-                        Connection_execute(con, "insert into zild_t (name, percents) values('%s', %d.%d);", data[i], i+1, i);
+                        Connection_execute(con, "insert into zild_t (name, percent) values('%s', %d.%d);", data[i], i+1, i);
                 // Assert that the last insert statement added one row
                 assert(Connection_rowsChanged(con) == 1);
                 /* Assert that last row id works for MySQL and SQLite. Neither Oracle nor PostgreSQL
@@ -166,20 +166,19 @@ static void testPool(const char *testURL) {
                 Connection_T con = ConnectionPool_getConnection(pool);
                 assert(con);
                 // 1. Prepared statement, perform a nonsense update to test rowsChanged
-                PreparedStatement_T p1 = Connection_prepareStatement(con, "update zild_t set images=?");
+                PreparedStatement_T p1 = Connection_prepareStatement(con, "update zild_t set image=?");
                 // Update with a "new" value as MariaDB will not update columns where the new value is
                 // the same as the old value. This creates the possibility that mysql_stmt_affected_rows()
                 // and PreparedStatement_rowsChanged() may not actually equal the number of rows matched,
                 // only the number of rows that were literally affected by the query.
                 // Ref Issue #50: https://bitbucket.org/tildeslash/libzdb/issues/50/tests-assertexception
-                printf("xxxxxxx\n");
-                PreparedStatement_setBlob(p1, 1, "xxx",100);
+                PreparedStatement_setString(p1, 1, "xxx");
                 PreparedStatement_execute(p1);
                 printf("\tRows changed: %lld\n", PreparedStatement_rowsChanged(p1));
                 // Assert that all 12 rows in the data set was changed
                 assert(PreparedStatement_rowsChanged(p1) == 12);
                 // 2. Prepared statement, update the table proper with "images". 
-                PreparedStatement_T pre = Connection_prepareStatement(con, "update zild_t set images=? where id=?");
+                PreparedStatement_T pre = Connection_prepareStatement(con, "update zild_t set image=? where id=?");
                 assert(pre);
                 assert(PreparedStatement_getParameterCount(pre) == 2);
                 for (i = 0; images[i]; i++) {
@@ -187,20 +186,14 @@ static void testPool(const char *testURL) {
                         PreparedStatement_setInt(pre, 2, i + 1);
                         PreparedStatement_execute(pre);
                 }
-                printf("xxxxxxx\n");
-                Connection_execute(con,"commit");
                 /* Add a database null blob value for id = 5 */
-                // PreparedStatement_setBlob(pre, 1, NULL, 0);
-                // printf("xxxxxxx\n");
-                // PreparedStatement_setInt(pre, 2, 5);
-                // printf("xxxxxxx\n");
-                // PreparedStatement_execute(pre);
-                printf("xxxxxxx\n");
+                PreparedStatement_setBlob(pre, 1, NULL, 0);
+                PreparedStatement_setInt(pre, 2, 5);
+                PreparedStatement_execute(pre);
                 /* Add a database null string value for id = 1 */
                 PreparedStatement_setString(pre, 1, NULL);
                 PreparedStatement_setInt(pre, 2, 1);
                 PreparedStatement_execute(pre);
-                printf("xxxxx\n");
                 /* Add a large blob */
                 memset(blob, 'x', 8192);
                 blob[8191] = 0;
@@ -214,6 +207,7 @@ static void testPool(const char *testURL) {
         }
         printf("=> Test5: OK\n\n");     
         
+        
         printf("=> Test6: Result Sets\n");
         {
                 int i;
@@ -222,13 +216,11 @@ static void testPool(const char *testURL) {
                 assert(con);
                 Connection_setQueryTimeout(con, 3000);
                 assert(Connection_getQueryTimeout(con) == 3000);
-                ResultSet_T rset = Connection_executeQuery(con, "select id, name, percents, images from zild_t where id < %d order by id;", 100);
+                ResultSet_T rset = Connection_executeQuery(con, "select id, name, percent, image from zild_t where id < %d order by id;", 100);
                 assert(rset);
                 printf("\tResult:\n");
                 printf("\tNumber of columns in resultset: %d\n\t", ResultSet_getColumnCount(rset));
-                printf("77777\n");
                 assert(4==ResultSet_getColumnCount(rset));
-                printf("11111\n");
                 i = 1;
                 printf("%-5s", ResultSet_getColumnName(rset, i++));
                 printf("%-16s", ResultSet_getColumnName(rset, i++));
@@ -238,36 +230,35 @@ static void testPool(const char *testURL) {
                 while (ResultSet_next(rset)) {
                         int id = ResultSet_getIntByName(rset, "id");
                         const char *name = ResultSet_getString(rset, 2);
-                        double percent = ResultSet_getDoubleByName(rset, "percents");
+                        double percent = ResultSet_getDoubleByName(rset, "percent");
                         const char *blob = (char*)ResultSet_getBlob(rset, 4, &imagesize);
                         printf("\t%-5d%-16s%-10.2f%-16.38s\n", id, name ? name : "null", percent, imagesize ? blob : "");
                 }
                 // Column count
-                
-                rset = Connection_executeQuery(con, "select images from zild_t where id=12;");
+                rset = Connection_executeQuery(con, "select image from zild_t where id=12;");
                 assert(1 == ResultSet_getColumnCount(rset));
                 
                 // Assert that types are interchangeable and that all data is returned
                 while (ResultSet_next(rset)) {
-                        const char *image = ResultSet_getStringByName(rset, "images");
-                        const void *blob = ResultSet_getBlobByName(rset, "images", &imagesize);
+                        const char *image = ResultSet_getStringByName(rset, "image");
+                        const void *blob = ResultSet_getBlobByName(rset, "image", &imagesize);
                         // Oracle does not support getting blob as string
                         if (! Str_startsWith(testURL, "oracle")) {
                                 assert(image && blob);
                                 assert(strlen(image) + 1 == 8192);
                         }
-                        // assert(imagesize == 8192);
+                        assert(imagesize == 8192);
                 }
                 
                 printf("\tResult: check isnull..");
-                rset = Connection_executeQuery(con, "select id, images from zild_t where id in(1,5,2);");
-                // while (ResultSet_next(rset)) {
-                //         int id = ResultSet_getIntByName(rset, "id");
-                //         if (id == 1 || id == 5)
-                //                 assert(ResultSet_isnull(rset, 2) == true);
-                //         else
-                //                 assert(ResultSet_isnull(rset, 2) == false);
-                // }
+                rset = Connection_executeQuery(con, "select id, image from zild_t where id in(1,5,2);");
+                while (ResultSet_next(rset)) {
+                        int id = ResultSet_getIntByName(rset, "id");
+                        if (id == 1 || id == 5)
+                                assert(ResultSet_isnull(rset, 2) == true);
+                        else
+                                assert(ResultSet_isnull(rset, 2) == false);
+                }
                 printf("success\n");
 
                 printf("\tResult: check max rows..");
@@ -407,7 +398,7 @@ static void testPool(const char *testURL) {
                 {
                         Connection_beginTransaction(con);
                         for (i = 0; data[i]; i++) 
-                                Connection_execute(con, "insert into zild_t (name, percents) values('%s', %d.%d);", data[i], i+1, i);
+                                Connection_execute(con, "insert into zild_t (name, percent) values('%s', %d.%d);", data[i], i+1, i);
                         Connection_commit(con);
                         printf("\tResult: table zild_t successfully created\n");
                 }
@@ -742,8 +733,6 @@ int main(void) {
                         printf("Please enter a valid database URL or stop by entering '.'\n");
                         goto next;
                 }
-                auto str=URL_toString(url);
-                printf("%s\n",str);
                 testPool(URL_toString(url));
                 URL_free(&url);
                 printf("%s", help);
